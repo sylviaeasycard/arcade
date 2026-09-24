@@ -1,28 +1,28 @@
 {
-  ""name"": ""精於勤 • Arcade • 荒於嬉"",
-  ""short_name"": ""Arcade"",
-  ""description"": ""集結轉盤、彈珠台、翻牌、貪食蛇、桌球與避雷的懷舊遊戲集"",
-  ""start_url"": ""./index.html"",
-  ""display"": ""standalone"",
-  ""background_color"": ""#0f172a"",
-  ""theme_color"": ""#0f172a"",
-  ""orientation"": ""portrait"",
-  ""icons"": [
+  "name": "精於勤 • Arcade • 荒於嬉",
+  "short_name": "Arcade",
+  "description": "集結轉盤、彈珠台、翻牌、貪食蛇、桌球與避雷的懷舊遊戲集",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#0f172a",
+  "orientation": "portrait",
+  "icons": [
     {
-      ""src"": ""icons/icon-192.png"",
-      ""sizes"": ""192x192"",
-      ""type"": ""image/png""
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
     },
     {
-      ""src"": ""icons/icon-512.png"",
-      ""sizes"": ""512x512"",
-      ""type"": ""image/png""
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
     },
     {
-      ""src"": ""icons/icon-512.png"",
-      ""sizes"": ""512x512"",
-      ""type"": ""image/png"",
-      ""purpose"": ""maskable""
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ]
 }
