@@ -2,1439 +2,929 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>精於勤 • Arcade • 荒於嬉</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>精於勤 Arcade 荒於嬉</title>
+    
+    <!-- PWA Setting -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#030712">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="夜市遊戲">
+    <link rel="apple-touch-icon" href="icons/icon-192.png">
 
-	<!-- PWA Manifest -->
-	<link rel="manifest" href="manifest.json">
-	<meta name="theme-color" content="#0f172a">
-
-	<!-- iOS Safari 專用設定 -->
-	<meta name="apple-mobile-web-app-capable" content="yes">
-	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-	<meta name="apple-mobile-web-app-title" content="精於勤 • Arcade • 荒於嬉">
-	<link rel="apple-touch-icon" href="icons/icon-192.png">
-
-	<!-- 防止手機雙擊放大與視口設定 -->
-	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800;900&family=Noto+Sans+TC:wght@500;700;900&display=swap" rel="stylesheet">
 
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Noto+Sans+TC:wght@400;700;900&display=swap');
+        :root {
+            --bg-main: #030712;
+            --card-bg: rgba(15, 23, 42, 0.75);
+            --card-border: rgba(56, 189, 248, 0.25);
+            --neon-blue: #38bdf8;
+            --neon-pink: #f43f5e;
+            --neon-purple: #a855f7;
+            --neon-green: #10b981;
+            --neon-yellow: #facc15;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+        }
 
-        body {
-            font-family: 'Fredoka', 'Noto Sans TC', sans-serif;
-            background: #090d16;
-            color: #f8fafc;
-            overflow-x: hidden;
+        * {
+            box-sizing: border-box;
             user-select: none;
             -webkit-user-select: none;
-			touch-action: manipulation;
-			overscroll-behavior-y: none;
+            margin: 0;
+            padding: 0;
+            font-family: 'Noto Sans TC', -apple-system, sans-serif;
+            -webkit-tap-highlight-color: transparent;
         }
 
-        /* Custom Scrollbars */
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #0f172a;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #334155;
-            border-radius: 9999px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #38bdf8;
+        html, body {
+            width: 100vw;
+            height: 100vh;
+            height: 100dvh;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            overflow: hidden; /* 嚴格禁止手機滑動 */
+            touch-action: manipulation;
+            position: fixed;
+            top: 0;
+            left: 0;
         }
 
-        /* Neon Text & Border Effects */
-        .neon-text-pink {
-            text-shadow: 0 0 8px rgba(244, 63, 94, 0.6), 0 0 20px rgba(244, 63, 94, 0.3);
-        }
-        .neon-text-blue {
-            text-shadow: 0 0 8px rgba(56, 189, 248, 0.6), 0 0 20px rgba(56, 189, 248, 0.3);
-        }
-        .neon-box {
-            box-shadow: 0 0 15px rgba(56, 189, 248, 0.15), inset 0 0 15px rgba(56, 189, 248, 0.05);
-            border: 1px solid rgba(56, 189, 248, 0.25);
-        }
-        .neon-box-pink {
-            box-shadow: 0 0 15px rgba(244, 63, 94, 0.15), inset 0 0 15px rgba(244, 63, 94, 0.05);
-            border: 1px solid rgba(244, 63, 94, 0.25);
-        }
-
-        /* Navigation Buttons */
-        .nav-item {
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            background: rgba(30, 41, 59, 0.7);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-        }
-        .nav-item:hover {
-            background: rgba(51, 65, 85, 0.8);
-            transform: translateY(-2px);
-        }
-        .nav-item.active {
-            background: linear-gradient(135deg, #0284c7, #6366f1);
-            border-color: #38bdf8;
-            box-shadow: 0 0 12px rgba(56, 189, 248, 0.4);
-            color: #ffffff;
+        /* 網格微光背景 */
+        body::before {
+            content: '';
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            top: -50%;
+            left: -50%;
+            background-image: 
+                radial-gradient(circle at 50% 50%, rgba(99, 102, 241, 0.12) 0%, transparent 50%),
+                linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 100% 100%, 24px 24px, 24px 24px;
+            z-index: -1;
+            pointer-events: none;
         }
 
-        /* Game Container Views */
-        .game-view {
+        /* 滿版 View 控制器 */
+        .app-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        /* 頂部導覽欄 */
+        .top-bar {
+            height: 52px;
+            padding: 0 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(3, 7, 18, 0.85);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            z-index: 50;
+            flex-shrink: 0;
+        }
+
+        .bar-title {
+            font-family: 'Orbitron', 'Noto Sans TC', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--neon-blue), var(--neon-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .back-btn {
             display: none;
-            opacity: 0;
-            transition: opacity 0.3s ease-in-out;
+            align-items: center;
+            gap: 4px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: var(--text-main);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.82rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
         }
-        .game-view.active {
+
+        .back-btn:active {
+            transform: scale(0.95);
+            background: var(--neon-blue);
+            color: #000;
+        }
+
+        /* 主內容顯示區域 */
+        .main-content {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .view-page {
+            position: absolute;
+            inset: 0;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 12px;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 0.25s ease, transform 0.25s ease;
+        }
+
+        .view-page.active {
             display: flex;
             opacity: 1;
+            transform: translateY(0);
         }
 
-        /* Option Chips Styling */
-        .chip {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 6px 12px;
-            background: rgba(30, 41, 59, 0.9);
-            border: 1px solid rgba(56, 189, 248, 0.3);
-            border-radius: 9999px;
-            font-size: 0.875rem;
-            font-weight: 600;
-            color: #e2e8f0;
-            animation: fadeIn 0.2s ease-out;
+        /* ===== 遊戲選單大廳 (Home Menu) ===== */
+        .menu-grid {
+            width: 100%;
+            max-width: 480px;
+            height: 100%;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            grid-template-rows: repeat(3, 1fr);
+            gap: 12px;
+            padding: 6px 0;
         }
-        .chip-remove {
+
+        .menu-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            backdrop-filter: blur(8px);
             cursor: pointer;
-            width: 18px;
-            height: 18px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .menu-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, transparent 100%);
+            pointer-events: none;
+        }
+
+        .menu-card:active {
+            transform: scale(0.96);
+            border-color: var(--neon-blue);
+            box-shadow: 0 0 15px rgba(56, 189, 248, 0.4);
+        }
+
+        .card-icon {
+            font-size: 2.2rem;
+            filter: drop-shadow(0 0 8px rgba(255,255,255,0.3));
+        }
+
+        .card-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-main);
+            letter-spacing: 0.5px;
+        }
+
+        .card-tag {
+            font-size: 0.68rem;
+            padding: 2px 8px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.06);
+            color: var(--neon-blue);
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        /* ===== 共通遊戲舞台容器 ===== */
+        .game-stage {
+            width: 100%;
+            max-width: 420px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .status-panel {
+            width: 100%;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 8px 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+
+        .status-val {
+            color: var(--neon-yellow);
+            font-weight: 700;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1rem;
+        }
+
+        .canvas-box {
+            position: relative;
+            width: 100%;
+            flex: 1;
+            max-height: 380px;
             display: flex;
             align-items: center;
             justify-content: center;
-            border-radius: 50%;
-            background: rgba(244, 63, 94, 0.2);
-            color: #f43f5e;
-            font-size: 11px;
-            transition: all 0.15s ease;
-        }
-        .chip-remove:hover {
-            background: #f43f5e;
-            color: #ffffff;
         }
 
-        /* Memory Game 3D Flip Styles */
+        canvas {
+            background: rgba(2, 6, 23, 0.8);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .ctrl-panel {
+            width: 100%;
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+            justify-content: center;
+        }
+
+        /* 現代科技風格按鈕 */
+        .tech-btn {
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            border: 1px solid var(--neon-blue);
+            color: var(--neon-blue);
+            padding: 10px 16px;
+            border-radius: 12px;
+            font-size: 0.88rem;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: all 0.15s;
+        }
+
+        .tech-btn:active {
+            transform: scale(0.95);
+            background: var(--neon-blue);
+            color: #030712;
+            box-shadow: 0 0 12px var(--neon-blue);
+        }
+
+        .tech-btn.pink {
+            border-color: var(--neon-pink);
+            color: var(--neon-pink);
+        }
+        .tech-btn.pink:active {
+            background: var(--neon-pink);
+            color: #fff;
+            box-shadow: 0 0 12px var(--neon-pink);
+        }
+
+        /* ===== 各遊戲微調 ===== */
+        /* 美食轉盤 */
+        .chip-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            max-height: 60px;
+            overflow-y: auto;
+            width: 100%;
+            padding: 4px;
+        }
+        .chip {
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.15);
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .chip-remove { color: var(--neon-pink); cursor: pointer; }
+
+        /* 踩地雷 Grid */
+        .mines-grid-wrapper {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        #minesGrid {
+            display: grid;
+            gap: 4px;
+            grid-template-columns: repeat(var(--board-size, 8), 1fr);
+            width: 100%;
+            max-width: 320px;
+            aspect-ratio: 1;
+        }
+
+        /* 記憶翻牌 Grid */
+        #memoryBoard {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            width: 100%;
+            max-width: 320px;
+            aspect-ratio: 1;
+        }
         .card-flip {
             perspective: 1000px;
-            cursor: pointer;
+            aspect-ratio: 1;
         }
         .card-inner {
             position: relative;
             width: 100%;
             height: 100%;
-            text-align: center;
-            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transition: transform 0.4s;
             transform-style: preserve-3d;
+            cursor: pointer;
         }
-        .card-flip.flipped .card-inner, .card-flip.matched .card-inner {
-            transform: rotateY(180deg);
-        }
+        .card-flip.flipped .card-inner { transform: rotateY(180deg); }
         .card-front, .card-back {
             position: absolute;
-            width: 100%;
-            height: 100%;
-            -webkit-backface-visibility: hidden;
+            inset: 0;
             backface-visibility: hidden;
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            border-radius: 12px;
-            font-size: 2rem;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+            font-size: 1.5rem;
+            border: 1px solid var(--card-border);
         }
-        .card-front {
-            background: linear-gradient(135deg, #1e293b, #0f172a);
-            border: 2px solid rgba(56, 189, 248, 0.25);
-            color: #38bdf8;
-        }
-        .card-back {
-            background: linear-gradient(135deg, #312e81, #4338ca);
-            border: 2px solid #818cf8;
-            transform: rotateY(180deg);
-        }
-        .card-flip.matched .card-back {
-            background: linear-gradient(135deg, #065f46, #059669);
-            border-color: #34d399;
-        }
+        .card-front { background: rgba(30, 41, 59, 0.9); color: var(--neon-blue); }
+        .card-back { background: rgba(15, 23, 42, 0.95); transform: rotateY(180deg); }
 
-        /* Dynamic Grid for Minesweeper */
-        #minesGrid {
+        /* D-Pad 按鈕（手機專用） */
+        .dpad {
             display: grid;
-            grid-template-columns: repeat(var(--board-size, 8), minmax(0, 1fr));
-            gap: 6px;
+            grid-template-columns: repeat(3, 42px);
+            grid-template-rows: repeat(2, 42px);
+            gap: 4px;
+            justify-content: center;
         }
-
-        /* Arcade Buttons */
-        .arcade-btn {
-            transition: all 0.15s ease;
-            box-shadow: 0 4px 0 rgba(0,0,0,0.4);
+        .dpad-btn {
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.15);
+            color: #fff;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
-        .arcade-btn:active {
-            transform: translateY(3px);
-            box-shadow: 0 1px 0 rgba(0,0,0,0.4);
-        }
-
-        .size-btn.active, .diff-btn.active-easy, .diff-btn.active-medium, .diff-btn.active-hard {
-            border-color: #38bdf8;
-            box-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
-            background: #0284c7 !important;
-            color: #ffffff;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: scale(0.9); }
-            to { opacity: 1; transform: scale(1); }
-        }
+        .dpad-btn:active { background: var(--neon-blue); color: #000; }
     </style>
 </head>
-<body class="min-h-screen flex flex-col justify-between items-center p-2 sm:p-4 bg-slate-950">
+<body>
 
-    <!-- App Header -->
-    <header class="w-full max-w-4xl text-center my-2 sm:my-4">
-        <h1 class="text-3xl sm:text-5xl font-extrabold tracking-wider neon-text-pink text-rose-500 mb-1">
-            🍧 精於勤 • Arcade • 荒於嬉 🎯
-        </h1>
-        <p class="text-xs sm:text-sm text-slate-400 font-medium">
-            Night Market Classic Arcade — 懷舊與經典遊戲街機
-        </p>
-
-        <!-- Navigation Tabs -->
-        <nav class="flex flex-wrap justify-center gap-2 mt-4 sm:mt-6 px-2">
-            <button onclick="switchGame('wheel', this)" class="nav-item active px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-1.5">
-                🍕 美食輪盤
-            </button>
-            <button onclick="switchGame('mines', this)" class="nav-item px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-1.5">
-                🌿 踩坑避雷
-            </button>
-            <button onclick="switchGame('pinball', this)" class="nav-item px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-1.5">
-                🔮 夜市彈珠台
-            </button>
-            <button onclick="switchGame('memory', this)" class="nav-item px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-1.5">
-                🎴 翻牌記憶
-            </button>
-            <button onclick="switchGame('snake', this)" class="nav-item px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-1.5">
-                🐍 貪食蛇
-            </button>
-            <button onclick="switchGame('pong', this)" class="nav-item px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-1.5">
-                🏓 彈跳對打球
-            </button>
-        </nav>
+<div class="app-container">
+    <!-- 頂部列 -->
+    <header class="top-bar">
+        <div class="bar-title">
+            <span>⚡</span>
+            <span id="appHeaderTitle">ARCADE HUB</span>
+        </div>
+        <button class="back-btn" id="backBtn" onclick="showMenu()">
+            <span>◀</span> 選單
+        </button>
     </header>
 
-    <!-- Main Content Container -->
-    <main class="w-full max-w-4xl flex-1 flex flex-col items-center justify-center my-2">
-
-        <!-- GAME 1: FOOD WHEEL -->
-        <section id="game-wheel" class="game-view active w-full flex-col items-center">
-            <div class="w-full bg-slate-900/80 backdrop-blur rounded-2xl p-4 sm:p-6 neon-box flex flex-col lg:flex-row gap-6 items-center">
-                <div class="relative w-full max-w-[340px] sm:max-w-[420px] aspect-square flex items-center justify-center">
-                    <!-- Pointer -->
-                    <div class="absolute -top-3 left-1/2 -translate-x-1/2 z-20 w-0 h-0 border-l-[14px] border-l-transparent border-r-[14px] border-r-transparent border-t-[28px] border-t-rose-500 filter drop-shadow-[0_4px_6px_rgba(244,63,94,0.6)]"></div>
-                    <canvas id="wheelCanvas" width="600" height="600" class="w-full h-full rounded-full cursor-pointer transition-transform"></canvas>
+    <!-- 主頁面容器 -->
+    <main class="main-content">
+        
+        <!-- ===== 0. 主選單大廳 ===== -->
+        <section id="view-menu" class="view-page active">
+            <div class="menu-grid">
+                <div class="menu-card" onclick="openGame('wheel', '🍕 美食大輪盤')">
+                    <div class="card-icon">🍕</div>
+                    <div class="card-title">美食輪盤</div>
+                    <div class="card-tag">DECISION</div>
                 </div>
-
-                <div class="flex-1 w-full flex flex-col justify-between gap-4">
-                    <div>
-                        <h2 class="text-xl sm:text-2xl font-bold text-sky-400 mb-2 flex items-center gap-2">
-                            🎡 晚餐吃什麼？幸運大輪盤
-                        </h2>
-                        <p class="text-xs sm:text-sm text-slate-300">
-                            選擇困難症救星！自訂夜市美食選單，點擊旋轉讓命運替你決定今晚的美食！
-                        </p>
-                    </div>
-
-                    <!-- Options Editor -->
-                    <div class="bg-slate-950/60 p-3 sm:p-4 rounded-xl border border-slate-800">
-                        <label class="text-xs font-bold text-slate-400 mb-2 block">新增/移除菜單選項：</label>
-                        <div class="flex gap-2 mb-3">
-                            <input type="text" id="newOptInput" placeholder="輸入美食名稱 (例如: 🧋 珍珠奶茶)" class="flex-1 bg-slate-800 text-sm text-slate-100 px-3 py-2 rounded-lg border border-slate-700 focus:outline-none focus:border-sky-500">
-                            <button onclick="addOption()" class="arcade-btn bg-emerald-600 hover:bg-emerald-500 text-white text-xs sm:text-sm font-bold px-4 py-2 rounded-lg">新增</button>
-                        </div>
-                        <div id="optionList" class="flex flex-wrap gap-2 max-h-32 overflow-y-auto p-1"></div>
-                    </div>
-
-                    <!-- Spin Result Display & Spin Button -->
-                    <div class="text-center bg-slate-950/80 p-3 rounded-xl border border-rose-500/30">
-                        <div id="wheelResult" class="text-lg sm:text-2xl font-extrabold text-amber-400 min-h-[36px] flex items-center justify-center">
-                            🔮 準備好後點擊下方旋轉！
-                        </div>
-                    </div>
-
-                    <button onclick="startSpin()" class="arcade-btn w-full py-3.5 bg-gradient-to-r from-rose-500 to-amber-500 hover:from-rose-400 hover:to-amber-400 text-white font-extrabold text-base sm:text-lg rounded-xl shadow-lg uppercase tracking-wider">
-                        🎯 旋轉大輪盤！
-                    </button>
+                <div class="menu-card" onclick="openGame('mines', '🌿 踩坑避雷')">
+                    <div class="card-icon">💣</div>
+                    <div class="card-title">踩坑避雷</div>
+                    <div class="card-tag">PUZZLE</div>
+                </div>
+                <div class="menu-card" onclick="openGame('pinball', '🔮 夜市彈珠台')">
+                    <div class="card-icon">🔮</div>
+                    <div class="card-title">夜市彈珠</div>
+                    <div class="card-tag">PHYSICS</div>
+                </div>
+                <div class="menu-card" onclick="openGame('memory', '🃏 記憶對對碰')">
+                    <div class="card-icon">🃏</div>
+                    <div class="card-title">記憶翻牌</div>
+                    <div class="card-tag">BRAIN</div>
+                </div>
+                <div class="menu-card" onclick="openGame('snake', '🐍 賽博貪食蛇')">
+                    <div class="card-icon">🐍</div>
+                    <div class="card-title">賽博貪食蛇</div>
+                    <div class="card-tag">CLASSIC</div>
+                </div>
+                <div class="menu-card" onclick="openGame('pong', '🏓 霓虹雙人桌球')">
+                    <div class="card-icon">🏓</div>
+                    <div class="card-title">霓虹桌球</div>
+                    <div class="card-tag">ARCADE</div>
                 </div>
             </div>
         </section>
 
-        <!-- GAME 2: MINESWEEPER -->
-        <section id="game-mines" class="game-view w-full flex-col items-center">
-            <div class="w-full bg-slate-900/80 backdrop-blur rounded-2xl p-4 sm:p-6 neon-box flex flex-col items-center gap-4">
-                <div class="w-full flex flex-wrap justify-between items-center gap-2 border-b border-slate-800 pb-3">
-                    <div>
-                        <h2 class="text-xl sm:text-2xl font-bold text-emerald-400">🌿 踩坑避雷 (夜市探險)</h2>
-                        <p class="text-xs text-slate-400">滑鼠左鍵/點擊翻開，右鍵/長按可插旗標記坑洞！</p>
-                    </div>
-                    <div id="minesStatus" class="text-xs sm:text-sm font-bold text-amber-300 bg-slate-950 px-3 py-1.5 rounded-lg border border-amber-500/30">
-                        載入地圖中...
-                    </div>
+        <!-- ===== 1. 美食輪盤 ===== -->
+        <section id="game-wheel" class="view-page">
+            <div class="game-stage">
+                <div class="status-panel">
+                    <span id="wheelResult" style="color:var(--neon-yellow); font-weight:bold;">🔮 點擊按鈕開始旋轉！</span>
                 </div>
-
-                <!-- Game Settings Bar -->
-                <div class="w-full flex flex-wrap items-center justify-between gap-2 text-xs">
-                    <div class="flex items-center gap-1.5">
-                        <span class="text-slate-400 font-bold">地圖大小:</span>
-                        <button onclick="setBoardSize(6, this)" class="size-btn bg-slate-800 px-2.5 py-1 rounded-md text-slate-200 border border-slate-700">6x6</button>
-                        <button onclick="setBoardSize(8, this)" class="size-btn active bg-slate-800 px-2.5 py-1 rounded-md text-slate-200 border border-slate-700">8x8</button>
-                        <button onclick="setBoardSize(10, this)" class="size-btn bg-slate-800 px-2.5 py-1 rounded-md text-slate-200 border border-slate-700">10x10</button>
-                        <button onclick="customBoardSize()" class="bg-slate-800 px-2.5 py-1 rounded-md text-slate-300 border border-slate-700">自訂</button>
-                    </div>
-                    <div class="flex items-center gap-1.5">
-                        <span class="text-slate-400 font-bold">難度:</span>
-                        <button onclick="setDifficulty('easy', 0.10, this)" class="diff-btn active-easy bg-slate-800 px-2 py-1 rounded-md text-emerald-400 border border-slate-700">簡單</button>
-                        <button onclick="setDifficulty('medium', 0.15, this)" class="diff-btn bg-slate-800 px-2 py-1 rounded-md text-amber-400 border border-slate-700">普通</button>
-                        <button onclick="setDifficulty('hard', 0.22, this)" class="diff-btn bg-slate-800 px-2 py-1 rounded-md text-rose-400 border border-slate-700">困難</button>
-                    </div>
-                    <button onclick="initMinesGame()" class="arcade-btn bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-3 py-1.5 rounded-lg">
-                        🔄 重新開局
-                    </button>
+                <div class="canvas-box">
+                    <canvas id="wheelCanvas" width="600" height="600"></canvas>
                 </div>
-
-                <!-- Grid Container -->
-                <div class="w-full max-w-[380px] sm:max-w-[420px] aspect-square bg-slate-950 p-3 rounded-2xl border border-slate-800 flex items-center justify-center">
-                    <div id="minesGrid" class="w-full h-full"></div>
+                <div class="chip-container" id="optionList"></div>
+                <div class="ctrl-panel">
+                    <input type="text" id="newOptInput" placeholder="新增美食..." style="background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.2); color:#fff; padding:6px 10px; border-radius:8px; width:120px; font-size:0.8rem;">
+                    <button class="tech-btn" onclick="addOption()">新增</button>
+                    <button class="tech-btn pink" onclick="startSpin()">🚀 旋轉！</button>
                 </div>
             </div>
         </section>
 
-        <!-- GAME 3: PINBALL -->
-        <section id="game-pinball" class="game-view w-full flex-col items-center">
-            <div class="w-full bg-slate-900/80 backdrop-blur rounded-2xl p-4 sm:p-6 neon-box flex flex-col md:flex-row gap-6 items-center justify-center">
-                <!-- Canvas Container -->
-                <div class="relative bg-slate-950 p-2 rounded-2xl border border-slate-800 flex justify-center items-center">
-                    <canvas id="pinballCanvas" width="325" height="410" class="rounded-xl shadow-inner"></canvas>
+        <!-- ===== 2. 踩坑避雷 ===== -->
+        <section id="game-mines" class="view-page">
+            <div class="game-stage">
+                <div class="status-panel">
+                    <span id="minesStatus">準備探索區域...</span>
                 </div>
-
-                <!-- Controls & Score Panel -->
-                <div class="flex-1 w-full max-w-xs flex flex-col gap-4">
-                    <div>
-                        <h2 class="text-2xl font-bold text-amber-400 mb-1">🔮 傳統夜市彈珠台</h2>
-                        <p class="text-xs text-slate-400">調整右側拉桿力道，拉得越滿彈珠飛得越高！</p>
+                <div class="canvas-box">
+                    <div class="mines-grid-wrapper">
+                        <div id="minesGrid"></div>
                     </div>
-
-                    <div class="grid grid-cols-2 gap-3">
-                        <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 text-center">
-                            <span class="text-xs text-slate-400 block font-bold">目前總分</span>
-                            <span id="pbScore" class="text-2xl font-extrabold text-amber-400">0</span>
-                        </div>
-                        <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 text-center">
-                            <span class="text-xs text-slate-400 block font-bold">剩餘彈珠</span>
-                            <span id="pbBalls" class="text-2xl font-extrabold text-sky-400">5</span>
-                        </div>
-                    </div>
-
-                    <!-- Power Range Slider -->
-                    <div class="bg-slate-950/70 p-4 rounded-xl border border-slate-800 flex flex-col gap-2">
-                        <div class="flex justify-between items-center text-xs font-bold">
-                            <span class="text-slate-300">🚀 發射力道</span>
-                            <span id="powerValue" class="text-rose-400">75%</span>
-                        </div>
-                        <input type="range" id="pbPowerRange" min="10" max="100" value="75" oninput="document.getElementById('powerValue').innerText = this.value + '%'" class="w-full accent-rose-500 cursor-pointer">
-                    </div>
-
-                    <button id="pbLaunchBtn" onclick="launchPinballClick()" class="arcade-btn w-full py-3.5 bg-gradient-to-r from-amber-500 to-rose-500 hover:from-amber-400 hover:to-rose-400 text-white font-extrabold text-lg rounded-xl shadow-lg">
-                        🚀 強力發射！
-                    </button>
+                </div>
+                <div class="ctrl-panel">
+                    <button class="tech-btn" onclick="setBoardSize(6)">6x6</button>
+                    <button class="tech-btn" onclick="setBoardSize(8)">8x8</button>
+                    <button class="tech-btn pink" onclick="initMinesGame()">🔄 重置</button>
                 </div>
             </div>
         </section>
 
-        <!-- GAME 4: MEMORY GAME -->
-        <section id="game-memory" class="game-view w-full flex-col items-center">
-            <div class="w-full bg-slate-900/80 backdrop-blur rounded-2xl p-4 sm:p-6 neon-box flex flex-col items-center gap-4">
-                <div class="w-full flex flex-wrap justify-between items-center border-b border-slate-800 pb-3 gap-2">
-                    <div>
-                        <h2 class="text-xl sm:text-2xl font-bold text-indigo-400">🎴 翻牌記憶對對碰</h2>
-                        <p class="text-xs text-slate-400">考驗腦力與記憶！翻開兩張相同萌寵圖案即配對成功。</p>
-                    </div>
-                    <button onclick="initMemoryGame()" class="arcade-btn bg-indigo-600 hover:bg-indigo-500 text-white text-xs sm:text-sm font-bold px-3.5 py-2 rounded-xl">
-                        🔄 重新洗牌
-                    </button>
+        <!-- ===== 3. 夜市彈珠台 ===== -->
+        <section id="game-pinball" class="view-page">
+            <div class="game-stage">
+                <div class="status-panel">
+                    <span>得分: <span id="pbScore" class="status-val">0</span></span>
+                    <span>剩餘球數: <span id="pbBalls" class="status-val">5</span></span>
                 </div>
-
-                <div class="flex gap-6 text-sm font-bold">
-                    <div class="bg-slate-950 px-4 py-2 rounded-xl border border-slate-800">
-                        ⏱️ 時間: <span id="memTime" class="text-amber-400">0</span> 秒
-                    </div>
-                    <div class="bg-slate-950 px-4 py-2 rounded-xl border border-slate-800">
-                        🐾 步數: <span id="memMoves" class="text-sky-400">0</span> 次
-                    </div>
+                <div class="canvas-box">
+                    <canvas id="pinballCanvas" width="320" height="400"></canvas>
                 </div>
-
-                <!-- Memory Board Grid -->
-                <div id="memoryBoard" class="w-full max-w-[420px] grid grid-cols-4 gap-3 aspect-square bg-slate-950 p-3 rounded-2xl border border-slate-800"></div>
-
-                <div id="memStatus" class="text-sm font-extrabold text-emerald-400 min-h-[24px]"></div>
+                <div class="ctrl-panel" style="align-items:center;">
+                    <span style="font-size:0.75rem; color:var(--text-muted);">力道:</span>
+                    <input type="range" id="pbPowerRange" min="20" max="100" value="70" style="width:90px;">
+                    <button class="tech-btn pink" id="pbLaunchBtn" onclick="launchPinballClick()">🚀 發射球！</button>
+                </div>
             </div>
         </section>
 
-        <!-- GAME 5: SNAKE -->
-        <section id="game-snake" class="game-view w-full flex-col items-center">
-            <div class="w-full bg-slate-900/80 backdrop-blur rounded-2xl p-4 sm:p-6 neon-box flex flex-col md:flex-row gap-6 items-center justify-center">
-                <!-- Canvas Container -->
-                <div class="bg-slate-950 p-2 rounded-2xl border border-slate-800 flex justify-center items-center">
-                    <canvas id="snakeCanvas" width="300" height="300" class="rounded-xl"></canvas>
+        <!-- ===== 4. 記憶對對碰 ===== -->
+        <section id="game-memory" class="view-page">
+            <div class="game-stage">
+                <div class="status-panel">
+                    <span>時間: <span id="memTime" class="status-val">0</span>s</span>
+                    <span>步數: <span id="memMoves" class="status-val">0</span></span>
                 </div>
+                <div id="memStatus" style="font-size:0.8rem; color:var(--neon-green); margin-bottom:4px; height:16px;"></div>
+                <div class="canvas-box">
+                    <div id="memoryBoard"></div>
+                </div>
+                <div class="ctrl-panel">
+                    <button class="tech-btn pink" onclick="initMemoryGame()">🔄 重新開始</button>
+                </div>
+            </div>
+        </section>
 
-                <div class="flex-1 w-full max-w-xs flex flex-col gap-4">
-                    <div>
-                        <h2 class="text-2xl font-bold text-sky-400 mb-1">🐍 經典夜市貪食蛇</h2>
-                        <p class="text-xs text-slate-400">使用鍵盤方向鍵或下方按鈕操控方向，吃掉美食獲得分數！</p>
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-3">
-                        <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 text-center">
-                            <span class="text-xs text-slate-400 block font-bold">目前得分</span>
-                            <span id="snakeScore" class="text-2xl font-extrabold text-sky-400">0</span>
-                        </div>
-                        <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 text-center">
-                            <span class="text-xs text-slate-400 block font-bold">最高紀錄</span>
-                            <span id="snakeHighScore" class="text-2xl font-extrabold text-amber-400">0</span>
-                        </div>
-                    </div>
-
-                    <button id="snakeStartBtn" onclick="toggleSnakeGame()" class="arcade-btn w-full py-3 bg-sky-600 hover:bg-sky-500 text-white font-extrabold text-base rounded-xl">
-                        ▶️ 開始遊戲
-                    </button>
-
-                    <!-- Touch D-Pad Controls -->
-                    <div class="grid grid-cols-3 gap-2 max-w-[180px] mx-auto w-full pt-2">
+        <!-- ===== 5. 賽博貪食蛇 ===== -->
+        <section id="game-snake" class="view-page">
+            <div class="game-stage">
+                <div class="status-panel">
+                    <span>得分: <span id="snakeScore" class="status-val">0</span></span>
+                    <span>最高分: <span id="snakeHighScore" class="status-val">0</span></span>
+                </div>
+                <div class="canvas-box">
+                    <canvas id="snakeCanvas" width="300" height="300"></canvas>
+                </div>
+                <div class="ctrl-panel" style="justify-content:space-between; align-items:center;">
+                    <button class="tech-btn pink" id="snakeStartBtn" onclick="toggleSnakeGame()">▶️ 開始</button>
+                    <!-- 方向操控鍵 -->
+                    <div class="dpad">
                         <div></div>
-                        <button onclick="changeSnakeDir('UP')" class="arcade-btn bg-slate-800 text-slate-200 py-2.5 rounded-lg font-bold text-lg">▲</button>
+                        <div class="dpad-btn" onclick="changeSnakeDir('UP')">▲</div>
                         <div></div>
-                        <button onclick="changeSnakeDir('LEFT')" class="arcade-btn bg-slate-800 text-slate-200 py-2.5 rounded-lg font-bold text-lg">◀</button>
-                        <button onclick="changeSnakeDir('DOWN')" class="arcade-btn bg-slate-800 text-slate-200 py-2.5 rounded-lg font-bold text-lg">▼</button>
-                        <button onclick="changeSnakeDir('RIGHT')" class="arcade-btn bg-slate-800 text-slate-200 py-2.5 rounded-lg font-bold text-lg">▶</button>
+                        <div class="dpad-btn" onclick="changeSnakeDir('LEFT')">◄</div>
+                        <div class="dpad-btn" onclick="changeSnakeDir('DOWN')">▼</div>
+                        <div class="dpad-btn" onclick="changeSnakeDir('RIGHT')">►</div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- GAME 6: PONG -->
-        <section id="game-pong" class="game-view w-full flex-col items-center">
-            <div class="w-full bg-slate-900/80 backdrop-blur rounded-2xl p-4 sm:p-6 neon-box flex flex-col md:flex-row gap-6 items-center justify-center">
-                <!-- Canvas Container -->
-                <div class="bg-slate-950 p-2 rounded-2xl border border-slate-800 flex justify-center items-center">
-                    <canvas id="pongCanvas" width="300" height="360" class="rounded-xl touch-none cursor-crosshair"></canvas>
+        <!-- ===== 6. 霓虹桌球 ===== -->
+        <section id="game-pong" class="view-page">
+            <div class="game-stage">
+                <div class="status-panel">
+                    <span>P1: <span id="pongP1Score" class="status-val">0</span></span>
+                    <span>VS</span>
+                    <span><span id="pongP2Label">AI</span>: <span id="pongP2Score" class="status-val">0</span></span>
                 </div>
-
-                <div class="flex-1 w-full max-w-xs flex flex-col gap-4">
-                    <div>
-                        <h2 class="text-2xl font-bold text-rose-400 mb-1">🏓 彈跳對抗乒乓球</h2>
-                        <p class="text-xs text-slate-400">左右滑動螢幕或移動滑鼠控制下方擋板擊球！</p>
-                    </div>
-
-                    <!-- Mode Select -->
-                    <div class="flex bg-slate-950 p-1 rounded-xl border border-slate-800">
-                        <button id="modeAiBtn" onclick="setPongMode('AI')" class="flex-1 py-1.5 rounded-lg text-xs font-bold text-slate-300 transition-all active">🤖 人機對戰</button>
-                        <button id="modePvpBtn" onclick="setPongMode('PVP')" class="flex-1 py-1.5 rounded-lg text-xs font-bold text-slate-300 transition-all">👥 雙人對打</button>
-                    </div>
-
-                    <!-- Scoreboard -->
-                    <div class="grid grid-cols-2 gap-3 text-center">
-                        <div class="bg-slate-950 p-3 rounded-xl border border-slate-800">
-                            <span class="text-xs text-sky-400 block font-bold">玩家 1 (底)</span>
-                            <span id="pongP1Score" class="text-2xl font-extrabold text-sky-400">0</span>
-                        </div>
-                        <div class="bg-slate-950 p-3 rounded-xl border border-slate-800">
-                            <span id="pongP2Label" class="text-xs text-rose-400 block font-bold">AI</span>
-                            <span id="pongP2Score" class="text-2xl font-extrabold text-rose-400">0</span>
-                        </div>
-                    </div>
-
-                    <button id="pongStartBtn" onclick="togglePongGame()" class="arcade-btn w-full py-3 bg-rose-600 hover:bg-rose-500 text-white font-extrabold text-base rounded-xl">
-                        🏓 開始對決
-                    </button>
-
-                    <!-- PVP Onscreen Hint -->
-                    <div id="pvpControls" class="hidden text-xs text-center text-slate-400 bg-slate-950/50 p-2 rounded-lg border border-slate-800">
-                        💡 雙人模式：上方玩家滑動上半螢幕，下方玩家滑動下半螢幕。
-                    </div>
+                <div class="canvas-box">
+                    <canvas id="pongCanvas" width="300" height="360"></canvas>
+                </div>
+                <div class="ctrl-panel">
+                    <button class="tech-btn" id="modeAiBtn" onclick="setPongMode('AI')">VS AI</button>
+                    <button class="tech-btn" id="modePvpBtn" onclick="setPongMode('PVP')">雙人對決</button>
+                    <button class="tech-btn pink" id="pongStartBtn" onclick="togglePongGame()">▶️ 開始</button>
                 </div>
             </div>
         </section>
 
     </main>
+</div>
 
-    <!-- Footer Footer -->
-    <footer class="w-full max-w-4xl text-center py-3 text-xs text-slate-500 border-t border-slate-800/80 mt-4">
-        © 2026 Night Market Arcade 台灣夜市經典遊戲樂園 — Designed for Mobile & Desktop
-    </footer>
+<!-- 遊戲邏輯腳本 -->
+<script>
+/* ===== 頁面導覽與路由邏輯 ===== */
+function showMenu() {
+    document.querySelectorAll('.view-page').forEach(el => el.classList.remove('active'));
+    document.getElementById('view-menu').classList.add('active');
+    document.getElementById('backBtn').style.display = 'none';
+    document.getElementById('appHeaderTitle').innerText = 'ARCADE HUB';
 
-    <script>
+    pauseSnakeGame();
+    pausePongGame();
+}
 
-	// 註冊 Service Worker 腳本
-	if ('serviceWorker' in navigator) {
-	  window.addEventListener('load', () => {
-		navigator.serviceWorker.register('./sw.js')
-		  .then((reg) => console.log('Service Worker 註冊成功:', reg.scope))
-		  .catch((err) => console.error('Service Worker 註冊失敗:', err));
-	  });
-	}
+function openGame(gameId, title) {
+    document.querySelectorAll('.view-page').forEach(el => el.classList.remove('active'));
+    const target = document.getElementById('game-' + gameId);
+    if (target) target.classList.add('active');
+    
+    document.getElementById('backBtn').style.display = 'flex';
+    document.getElementById('appHeaderTitle').innerText = title;
 
-    // Global State & Option Data
-    let options = ['🍕 披薩', '🍜 熱湯麵', '🍱 便當', '🍔 漢堡', '🍲 火鍋', '🍣 壽司'];
-    const colors = ['#f43f5e', '#f97316', '#eab308', '#10b981', '#06b6d4', '#6366f1', '#a855f7', '#ec4899'];
+    if (gameId === 'wheel') drawWheel();
+    if (gameId === 'mines') initMinesGame();
+    if (gameId === 'pinball') drawPinball();
+    if (gameId === 'memory') initMemoryGame();
+    if (gameId === 'snake') drawSnake();
+    if (gameId === 'pong') drawPong();
+}
 
-    function loadData() {
-        const savedOptions = localStorage.getItem('arcade_food_options');
-        if (savedOptions) {
-            try { options = JSON.parse(savedOptions); } catch (e) {}
-        }
-        renderOptionChips();
+/* ===== 1. 美食大輪盤 ===== */
+let options = ['🍕 披薩', '🍜 熱湯麵', '🍱 便當', '🍔 漢堡', '🍲 火鍋', '🍣 壽司'];
+const colors = ['#f43f5e', '#f97316', '#eab308', '#10b981', '#06b6d4', '#6366f1', '#a855f7', '#ec4899'];
+const canvas = document.getElementById('wheelCanvas');
+const ctx = canvas.getContext('2d');
+let currentAngle = 0;
+let isSpinning = false;
+
+function loadData() {
+    const saved = localStorage.getItem('arcade_food_options');
+    if (saved) { try { options = JSON.parse(saved); } catch(e){} }
+    renderOptionChips();
+}
+function saveData() { localStorage.setItem('arcade_food_options', JSON.stringify(options)); }
+
+function renderOptionChips() {
+    const container = document.getElementById('optionList');
+    container.innerHTML = '';
+    options.forEach((opt, idx) => {
+        const chip = document.createElement('div');
+        chip.className = 'chip';
+        chip.innerHTML = `<span>${opt}</span><span class="chip-remove" onclick="removeOption(${idx})">✕</span>`;
+        container.appendChild(chip);
+    });
+}
+function addOption() {
+    const input = document.getElementById('newOptInput');
+    const val = input.value.trim();
+    if (val) {
+        options.push(val); input.value = '';
+        saveData(); renderOptionChips(); drawWheel();
+    }
+}
+function removeOption(idx) {
+    if (options.length <= 2) return alert("至少留2個選項！");
+    options.splice(idx, 1);
+    saveData(); renderOptionChips(); drawWheel();
+}
+function drawWheel() {
+    const num = options.length;
+    const arc = (2 * Math.PI) / num;
+    ctx.clearRect(0, 0, 600, 600);
+
+    for (let i = 0; i < num; i++) {
+        const angle = currentAngle + i * arc;
+        ctx.beginPath();
+        ctx.moveTo(300, 300);
+        ctx.arc(300, 300, 280, angle, angle + arc);
+        ctx.fillStyle = colors[i % colors.length];
+        ctx.fill(); ctx.stroke();
+
+        ctx.save();
+        ctx.translate(300 + Math.cos(angle + arc / 2) * 175, 300 + Math.sin(angle + arc / 2) * 175);
+        ctx.rotate(angle + arc / 2 + Math.PI / 2);
+        ctx.font = "900 28px sans-serif";
+        ctx.fillStyle = "#ffffff";
+        ctx.fillText(options[i], -ctx.measureText(options[i]).width / 2, 0);
+        ctx.restore();
+    }
+}
+function startSpin() {
+    if (isSpinning || options.length < 2) return;
+    isSpinning = true;
+    document.getElementById('wheelResult').innerText = "🔮 旋轉中...";
+    const spinAngle = Math.PI * 10 + Math.random() * Math.PI * 4;
+    let start = null;
+    function animate(timestamp) {
+        if (!start) start = timestamp;
+        const progress = Math.min((timestamp - start) / 3500, 1);
+        const easeOut = 1 - Math.pow(1 - progress, 3);
+        currentAngle = easeOut * spinAngle;
         drawWheel();
-    }
-
-    function saveData() {
-        localStorage.setItem('arcade_food_options', JSON.stringify(options));
-    }
-
-    function switchGame(gameId, btnEl) {
-        document.querySelectorAll('.game-view').forEach(el => el.classList.remove('active'));
-        document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-        
-        document.getElementById('game-' + gameId).classList.add('active');
-        if (btnEl) btnEl.classList.add('active');
-
-        // 切換時暫停其他動畫遊戲
-        pauseSnakeGame();
-        pausePongGame();
-
-        if (gameId === 'pinball') drawPinball();
-        if (gameId === 'memory') initMemoryGame();
-        if (gameId === 'snake') drawSnake();
-        if (gameId === 'pong') drawPong();
-    }
-
-    // Custom Modal Replacement for alert
-    function showCustomAlert(msg) {
-        const modal = document.createElement('div');
-        modal.className = "fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-fade-in";
-        modal.innerHTML = `
-            <div class="bg-slate-900 border border-slate-700 rounded-2xl p-6 max-w-xs w-full text-center shadow-2xl">
-                <div class="text-3xl mb-3">🎮</div>
-                <p class="text-slate-200 text-sm font-bold mb-5">${msg}</p>
-                <button onclick="this.closest('.fixed').remove()" class="w-full py-2.5 bg-sky-500 hover:bg-sky-400 text-white font-bold rounded-xl">確定</button>
-            </div>
-        `;
-        document.body.appendChild(modal);
-    }
-
-    /* ==========================================================================
-       GAME 1: FOOD WHEEL LOGIC
-       ========================================================================== */
-    const canvas = document.getElementById('wheelCanvas');
-    const ctx = canvas.getContext('2d');
-    let currentAngle = 0;
-    let isSpinning = false;
-
-    function renderOptionChips() {
-        const container = document.getElementById('optionList');
-        container.innerHTML = '';
-        options.forEach((opt, idx) => {
-            const chip = document.createElement('div');
-            chip.className = 'chip';
-            chip.innerHTML = `<span>${opt}</span><span class="chip-remove" onclick="removeOption(${idx})">✕</span>`;
-            container.appendChild(chip);
-        });
-    }
-
-    function addOption() {
-        const input = document.getElementById('newOptInput');
-        const val = input.value.trim();
-        if (val) {
-            options.push(val);
-            input.value = '';
-            saveData();
-            renderOptionChips();
-            drawWheel();
+        if (progress < 1) requestAnimationFrame(animate);
+        else {
+            isSpinning = false;
+            const num = options.length;
+            const arc = (2 * Math.PI) / num;
+            let norm = (1.5 * Math.PI - (currentAngle % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
+            let idx = Math.floor(norm / arc);
+            document.getElementById('wheelResult').innerText = "🎉 決定吃：" + options[idx] + "！";
         }
     }
+    requestAnimationFrame(animate);
+}
 
-    function removeOption(index) {
-        if (options.length <= 2) {
-            showCustomAlert("至少需要保留 2 個選項喔！");
-            return;
-        }
-        options.splice(index, 1);
-        saveData();
-        renderOptionChips();
-        drawWheel();
+/* ===== 2. 踩坑避雷 ===== */
+let boardSize = 8;
+let board = [];
+let minesGameOver = false;
+
+function setBoardSize(sz) { boardSize = sz; initMinesGame(); }
+function initMinesGame() {
+    minesGameOver = false;
+    const mineCount = Math.max(1, Math.floor(boardSize * boardSize * 0.15));
+    document.documentElement.style.setProperty('--board-size', boardSize);
+    document.getElementById('minesStatus').innerText = `地圖 (${boardSize}x${boardSize})，藏有 ${mineCount} 個坑！`;
+    const grid = document.getElementById('minesGrid');
+    grid.innerHTML = '';
+    
+    board = Array(boardSize).fill(null).map(() => 
+        Array(boardSize).fill(null).map(() => ({ mine: false, revealed: false, count: 0 }))
+    );
+
+    let placed = 0;
+    while (placed < mineCount) {
+        let r = Math.floor(Math.random() * boardSize), c = Math.floor(Math.random() * boardSize);
+        if (!board[r][c].mine) { board[r][c].mine = true; placed++; }
     }
 
-    function drawWheel() {
-        const num = options.length;
-        const arc = (2 * Math.PI) / num;
-        ctx.clearRect(0, 0, 600, 600);
-
-        ctx.beginPath();
-        ctx.arc(300, 300, 295, 0, Math.PI * 2);
-        ctx.fillStyle = "#1e293b";
-        ctx.fill();
-        ctx.lineWidth = 8;
-        ctx.strokeStyle = "rgba(255,255,255,0.15)";
-        ctx.stroke();
-
-        for (let i = 0; i < num; i++) {
-            const angle = currentAngle + i * arc;
-            
-            ctx.beginPath();
-            ctx.moveTo(300, 300);
-            ctx.arc(300, 300, 280, angle, angle + arc);
-            ctx.fillStyle = colors[i % colors.length];
-            ctx.fill();
-
-            ctx.strokeStyle = "rgba(0,0,0,0.15)";
-            ctx.lineWidth = 2;
-            ctx.stroke();
-
-            ctx.save();
-            ctx.translate(300 + Math.cos(angle + arc / 2) * 175, 300 + Math.sin(angle + arc / 2) * 175);
-            ctx.rotate(angle + arc / 2 + Math.PI / 2);
-            
-            const textFontSize = num > 10 ? 22 : (num > 6 ? 26 : 30);
-            ctx.font = `900 ${textFontSize}px -apple-system, sans-serif`;
-            
-            ctx.shadowColor = "rgba(0, 0, 0, 0.5)";
-            ctx.shadowBlur = 6;
-            ctx.fillStyle = "#ffffff";
-            ctx.fillText(options[i], -ctx.measureText(options[i]).width / 2, 0);
-            ctx.restore();
-        }
-
-        ctx.beginPath();
-        ctx.arc(300, 300, 45, 0, Math.PI * 2);
-        ctx.fillStyle = "#0f172a";
-        ctx.fill();
-        ctx.lineWidth = 5;
-        ctx.strokeStyle = "#38bdf8";
-        ctx.stroke();
-
-        ctx.beginPath();
-        ctx.arc(300, 300, 15, 0, Math.PI * 2);
-        ctx.fillStyle = "#38bdf8";
-        ctx.fill();
-    }
-
-    function startSpin() {
-        if (isSpinning || options.length < 2) return;
-        isSpinning = true;
-        document.getElementById('wheelResult').innerText = "🔮 命運旋轉中...";
-        
-        const spinAngle = Math.PI * 10 + Math.random() * Math.PI * 4;
-        let start = null;
-        const duration = 4000;
-
-        function animate(timestamp) {
-            if (!start) start = timestamp;
-            const progress = Math.min((timestamp - start) / duration, 1);
-            const easeOut = 1 - Math.pow(1 - progress, 3.5);
-            
-            currentAngle = easeOut * spinAngle;
-            drawWheel();
-
-            if (progress < 1) {
-                requestAnimationFrame(animate);
-            } else {
-                isSpinning = false;
-                determineResult();
-            }
-        }
-        requestAnimationFrame(animate);
-    }
-
-    function determineResult() {
-        const num = options.length;
-        const arc = (2 * Math.PI) / num;
-        let normalizedAngle = (1.5 * Math.PI - (currentAngle % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
-        let index = Math.floor(normalizedAngle / arc);
-        document.getElementById('wheelResult').innerText = "🎉 今晚就吃：" + options[index] + "！";
-        if (navigator.vibrate) navigator.vibrate([40, 40, 80]);
-    }
-
-    /* ==========================================================================
-       GAME 2: MINESWEEPER LOGIC
-       ========================================================================== */
-    let boardSize = 8;
-    let mineRatio = 0.15;
-    let board = [];
-    let minesGameOver = false;
-
-    function setBoardSize(size, btnEl) {
-        boardSize = size;
-        document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('active'));
-        if (btnEl) btnEl.classList.add('active');
-        initMinesGame();
-    }
-
-    function setDifficulty(level, ratio, btnEl) {
-        mineRatio = ratio;
-        document.querySelectorAll('.diff-btn').forEach(b => {
-            b.classList.remove('active-easy', 'active-medium', 'active-hard');
-        });
-        if (btnEl) btnEl.classList.add('active-' + level);
-        initMinesGame();
-    }
-
-    function customBoardSize() {
-        const input = prompt("請輸入邊長 N (4 ~ 12):", boardSize);
-        if (input) {
-            let val = parseInt(input);
-            if (!isNaN(val) && val >= 4 && val <= 12) setBoardSize(val, null);
-        }
-    }
-
-    function initMinesGame() {
-        minesGameOver = false;
-        const mineCount = Math.max(1, Math.floor(boardSize * boardSize * mineRatio));
-        
-        document.documentElement.style.setProperty('--board-size', boardSize);
-        document.getElementById('minesStatus').innerText = `地圖 (${boardSize}x${boardSize})，藏有 ${mineCount} 個坑洞！`;
-        
-        const grid = document.getElementById('minesGrid');
-        grid.innerHTML = '';
-        
-        board = Array(boardSize).fill(null).map(() => 
-            Array(boardSize).fill(null).map(() => ({ mine: false, revealed: false, flagged: false, count: 0 }))
-        );
-
-        let placed = 0;
-        while (placed < mineCount) {
-            let r = Math.floor(Math.random() * boardSize);
-            let c = Math.floor(Math.random() * boardSize);
-            if (!board[r][c].mine) {
-                board[r][c].mine = true;
-                placed++;
-            }
-        }
-
-        for (let r = 0; r < boardSize; r++) {
-            for (let c = 0; c < boardSize; c++) {
-                if (board[r][c].mine) continue;
-                let count = 0;
-                for (let dr = -1; dr <= 1; dr++) {
-                    for (let dc = -1; dc <= 1; dc++) {
-                        let nr = r + dr, nc = c + dc;
-                        if (nr >= 0 && nr < boardSize && nc >= 0 && nc < boardSize && board[nr][nc].mine) {
-                            count++;
-                        }
-                    }
-                }
-                board[r][c].count = count;
-            }
-        }
-
-        const fontSize = boardSize > 9 ? '12px' : '15px';
-
-        for (let r = 0; r < boardSize; r++) {
-            for (let c = 0; c < boardSize; c++) {
-                const btn = document.createElement('button');
-                btn.style.cssText = `width:100%; height:100%; font-size:${fontSize}; font-weight:bold; border:none; border-radius:8px; background:linear-gradient(135deg, #10b981, #059669); color:white; cursor:pointer; padding:0;`;
-                btn.innerText = "🌿";
-                
-                btn.oncontextmenu = (e) => {
-                    e.preventDefault();
-                    toggleFlag(r, c, btn);
-                };
-                btn.onclick = () => revealCell(r, c);
-                
-                grid.appendChild(btn);
-            }
-        }
-    }
-
-    function toggleFlag(r, c, btn) {
-        if (minesGameOver || board[r][c].revealed) return;
-        board[r][c].flagged = !board[r][c].flagged;
-        btn.innerText = board[r][c].flagged ? "🚩" : "🌿";
-        if (navigator.vibrate) navigator.vibrate(20);
-    }
-
-    function revealCell(r, c) {
-        if (minesGameOver || board[r][c].revealed || board[r][c].flagged) return;
-        
-        board[r][c].revealed = true;
-        const grid = document.getElementById('minesGrid');
-        const btn = grid.children[r * boardSize + c];
-        
-        if (board[r][c].mine) {
-            minesGameOver = true;
-            btn.innerText = "💥";
-            btn.style.background = "linear-gradient(135deg, #ef4444, #dc2626)";
-            document.getElementById('minesStatus').innerText = "💥 踩到坑了！人生總有意外，重新再來！";
-            if (navigator.vibrate) navigator.vibrate([80, 40, 80]);
-            revealAllMines();
-        } else {
-            btn.style.background = "rgba(255,255,255,0.08)";
-            btn.style.boxShadow = "none";
-            
-            const countColors = ['', '#38bdf8', '#4ade80', '#facc15', '#f97316', '#f43f5e', '#a855f7'];
-            const count = board[r][c].count;
-            btn.innerText = count > 0 ? count : "";
-            if (count > 0) btn.style.color = countColors[count] || '#fff';
-            
-            if (navigator.vibrate) navigator.vibrate(12);
-            
-            if (board[r][c].count === 0) {
-                for (let dr = -1; dr <= 1; dr++) {
-                    for (let dc = -1; dc <= 1; dc++) {
-                        let nr = r + dr, nc = c + dc;
-                        if (nr >= 0 && nr < boardSize && nc >= 0 && nc < boardSize) {
-                            revealCell(nr, nc);
-                        }
-                    }
+    for (let r = 0; r < boardSize; r++) {
+        for (let c = 0; c < boardSize; c++) {
+            if (board[r][c].mine) continue;
+            let cnt = 0;
+            for (let dr = -1; dr <= 1; dr++) {
+                for (let dc = -1; dc <= 1; dc++) {
+                    let nr = r + dr, nc = c + dc;
+                    if (nr >= 0 && nr < boardSize && nc >= 0 && nc < boardSize && board[nr][nc].mine) cnt++;
                 }
             }
-            checkMinesWin();
+            board[r][c].count = cnt;
         }
     }
 
-    function revealAllMines() {
-        const grid = document.getElementById('minesGrid');
-        for (let r = 0; r < boardSize; r++) {
-            for (let c = 0; c < boardSize; c++) {
-                if (board[r][c].mine) {
-                    const btn = grid.children[r * boardSize + c];
-                    btn.innerText = "🕳️";
-                    btn.style.background = "linear-gradient(135deg, #f43f5e, #9f1239)";
-                }
-            }
+    for (let r = 0; r < boardSize; r++) {
+        for (let c = 0; c < boardSize; c++) {
+            const btn = document.createElement('button');
+            btn.style.cssText = "width:100%; height:100%; border:none; border-radius:6px; background:rgba(255,255,255,0.08); color:#fff; font-weight:bold;";
+            btn.innerText = "🌿";
+            btn.onclick = () => revealCell(r, c);
+            grid.appendChild(btn);
         }
     }
-
-    function checkMinesWin() {
-        let unrevealedSafeCells = 0;
-        for (let r = 0; r < boardSize; r++) {
-            for (let c = 0; c < boardSize; c++) {
-                if (!board[r][c].mine && !board[r][c].revealed) unrevealedSafeCells++;
-            }
-        }
-        if (unrevealedSafeCells === 0) {
-            minesGameOver = true;
-            document.getElementById('minesStatus').innerText = "🎉 太棒了！順利避開所有人生陷阱！";
-            if (navigator.vibrate) navigator.vibrate([50, 50, 50, 50, 100]);
-        }
+}
+function revealCell(r, c) {
+    if (minesGameOver || board[r][c].revealed) return;
+    board[r][c].revealed = true;
+    const grid = document.getElementById('minesGrid');
+    const btn = grid.children[r * boardSize + c];
+    
+    if (board[r][c].mine) {
+        minesGameOver = true;
+        btn.innerText = "💥"; btn.style.background = "#ef4444";
+        document.getElementById('minesStatus').innerText = "💥 踩到坑了！遊戲結束！";
+    } else {
+        btn.style.background = "rgba(56, 189, 248, 0.2)";
+        btn.innerText = board[r][c].count > 0 ? board[r][c].count : "";
     }
+}
 
-    /* ==========================================================================
-       GAME 3: PINBALL LOGIC
-       ========================================================================== */
-    const pbCanvas = document.getElementById('pinballCanvas');
-    const pbCtx = pbCanvas.getContext('2d');
+/* ===== 3. 夜市彈珠台 ===== */
+const pbCanvas = document.getElementById('pinballCanvas');
+const pbCtx = pbCanvas.getContext('2d');
+let pbScore = 0, pbBallsLeft = 5, pbIsMoving = false;
+let pbBall = { x: 297, y: 360, radius: 6, vx: 0, vy: 0 };
 
-    let pbScore = 0;
-    let pbBallsLeft = 5;
-    let pbIsMoving = false;
-    let animFrameId = null;
-
-    let pbBall = { x: 297, y: 360, radius: 7, vx: 0, vy: 0 };
-    let landedBalls = [];
-
-    const pbPegs = [
-        {x: 60, y: 110}, {x: 110, y: 110}, {x: 160, y: 110}, {x: 210, y: 110},
-        {x: 85, y: 150}, {x: 135, y: 150}, {x: 185, y: 150}, {x: 235, y: 150},
-        {x: 60, y: 190}, {x: 110, y: 190}, {x: 160, y: 190}, {x: 210, y: 190},
-        {x: 85, y: 230}, {x: 135, y: 230}, {x: 185, y: 230},
-        {x: 60, y: 270}, {x: 110, y: 270}, {x: 160, y: 270}, {x: 210, y: 270}
-    ];
-
-    const pbSlots = [
-        {x: 10, width: 52, score: 50, label: "50分", color: "#6366f1"},
-        {x: 64, width: 52, score: 100, label: "100分", color: "#38bdf8"},
-        {x: 118, width: 52, score: 300, label: "300分", color: "#f59e0b"},
-        {x: 172, width: 52, score: 100, label: "100分", color: "#38bdf8"},
-        {x: 226, width: 52, score: 50, label: "50分", color: "#6366f1"}
-    ];
-
-    function drawPinball() {
-        pbCtx.clearRect(0, 0, pbCanvas.width, pbCanvas.height);
-
-        pbCtx.fillStyle = "#1c1512";
-        pbCtx.fillRect(0, 0, pbCanvas.width, pbCanvas.height);
-
-        pbCtx.strokeStyle = "rgba(255,255,255,0.2)";
-        pbCtx.lineWidth = 3;
-        pbCtx.beginPath();
-        pbCtx.moveTo(275, 80);
-        pbCtx.lineTo(275, 400);
-        pbCtx.stroke();
-
-        pbCtx.strokeStyle = "rgba(255,215,0,0.3)";
-        pbCtx.lineWidth = 4;
-        pbCtx.beginPath();
-        pbCtx.arc(160, 90, 155, Math.PI, 0, false);
-        pbCtx.stroke();
-
-        pbPegs.forEach(p => {
-            pbCtx.beginPath();
-            pbCtx.arc(p.x, p.y, 4, 0, Math.PI * 2);
-            pbCtx.fillStyle = "#f59e0b";
-            pbCtx.fill();
-            pbCtx.strokeStyle = "#fff";
-            pbCtx.lineWidth = 1;
-            pbCtx.stroke();
-        });
-
-        pbSlots.forEach(s => {
-            pbCtx.fillStyle = "rgba(255,255,255,0.03)";
-            pbCtx.fillRect(s.x, 320, s.width, 80);
-            
-            pbCtx.strokeStyle = s.color;
-            pbCtx.lineWidth = 2;
-            pbCtx.strokeRect(s.x, 320, s.width, 80);
-
-            pbCtx.fillStyle = s.color;
-            pbCtx.font = "bold 11px -apple-system, sans-serif";
-            pbCtx.textAlign = "center";
-            pbCtx.fillText(s.label, s.x + s.width / 2, 385);
-        });
-
-        landedBalls.forEach(b => {
-            const slot = pbSlots[b.slotIndex];
-            const ballX = slot.x + slot.width / 2;
-            const ballY = 368 - (b.stackIndex * 14);
-            drawCrystalBall(ballX, ballY);
-        });
-
-        if (!pbIsMoving && pbBallsLeft > 0) drawCrystalBall(297, 360);
-        if (pbIsMoving) drawCrystalBall(pbBall.x, pbBall.y);
-    }
-
-    function drawCrystalBall(x, y) {
-        let grad = pbCtx.createRadialGradient(x - 2, y - 2, 1, x, y, pbBall.radius);
-        grad.addColorStop(0, '#e0f2fe');
-        grad.addColorStop(0.4, '#38bdf8');
-        grad.addColorStop(1, '#0369a1');
-
-        pbCtx.beginPath();
-        pbCtx.arc(x, y, pbBall.radius, 0, Math.PI * 2);
-        pbCtx.fillStyle = grad;
-        pbCtx.fill();
-        pbCtx.strokeStyle = "#bae6fd";
-        pbCtx.lineWidth = 1;
-        pbCtx.stroke();
-    }
-
-    function updatePinball() {
-        if (!pbIsMoving) return;
-
-        pbBall.vy += 0.28;
-        pbBall.x += pbBall.vx;
-        pbBall.y += pbBall.vy;
-
-        if (pbBall.x - pbBall.radius < 5) {
-            pbBall.vx = Math.abs(pbBall.vx) * 0.8;
-            pbBall.x = 5 + pbBall.radius;
-        }
-        if (pbBall.x + pbBall.radius > 315) {
-            pbBall.vx = -Math.abs(pbBall.vx) * 0.8;
-            pbBall.x = 315 - pbBall.radius;
-        }
-        if (pbBall.x + pbBall.radius > 275 && pbBall.x < 278 && pbBall.y > 80) {
-            pbBall.vx = -Math.abs(pbBall.vx) * 0.8;
-            pbBall.x = 275 - pbBall.radius;
-        }
-
-        if (pbBall.y - pbBall.radius < 8) {
-            pbBall.vy = Math.abs(pbBall.vy) * 0.5;
-            pbBall.y = 8 + pbBall.radius;
-            pbBall.vx = - (4 + Math.random() * 4);
-        }
-
-        pbPegs.forEach(p => {
-            let dx = pbBall.x - p.x;
-            let dy = pbBall.y - p.y;
-            let dist = Math.sqrt(dx * dx + dy * dy);
-            
-            if (dist < pbBall.radius + 4) {
-                let angle = Math.atan2(dy, dx);
-                angle += (Math.random() - 0.5) * 0.4;
-                
-                let speed = Math.sqrt(pbBall.vx * pbBall.vx + pbBall.vy * pbBall.vy) * 0.85;
-                speed = Math.max(speed, 2.5);
-                
-                pbBall.vx = Math.cos(angle) * speed;
-                pbBall.vy = Math.sin(angle) * speed;
-
-                pbBall.x = p.x + Math.cos(angle) * (pbBall.radius + 4.5);
-                pbBall.y = p.y + Math.sin(angle) * (pbBall.radius + 4.5);
-
-                if (navigator.vibrate) navigator.vibrate(5);
-            }
-        });
-
-        if (pbBall.y > 325) {
-            let landedSlotIndex = -1;
-            pbSlots.forEach((s, idx) => {
-                if (pbBall.x >= s.x && pbBall.x < s.x + s.width) landedSlotIndex = idx;
-            });
-
-            if (landedSlotIndex === -1) landedSlotIndex = pbBall.x > 275 ? 4 : 0;
-
-            pbScore += pbSlots[landedSlotIndex].score;
-            document.getElementById('pbScore').innerText = pbScore;
-
-            const currentStackCount = landedBalls.filter(b => b.slotIndex === landedSlotIndex).length;
-            landedBalls.push({ slotIndex: landedSlotIndex, stackIndex: currentStackCount });
-
-            resetPinballState();
-            return;
-        }
-
-        drawPinball();
-        if (pbIsMoving) animFrameId = requestAnimationFrame(updatePinball);
-    }
-
-    function launchPinballClick() {
-        if (pbIsMoving) return;
-
-        const btn = document.getElementById('pbLaunchBtn');
-
-        if (pbBallsLeft <= 0) {
-            pbScore = 0; pbBallsLeft = 5; landedBalls = [];
-            document.getElementById('pbScore').innerText = pbScore;
-            document.getElementById('pbBalls').innerText = pbBallsLeft;
-            btn.innerText = "🚀 強力發射！";
-            drawPinball();
-            return;
-        }
-
-        pbBallsLeft--;
-        document.getElementById('pbBalls').innerText = pbBallsLeft;
-
-        const powerVal = parseInt(document.getElementById('pbPowerRange').value);
-        const launchSpeed = 18 + (powerVal / 100) * 10;
-
-        pbBall.x = 297; pbBall.y = 350; pbBall.vx = -0.2; pbBall.vy = -launchSpeed;
-
-        if (navigator.vibrate) navigator.vibrate(30);
-
-        pbIsMoving = true;
-        if (animFrameId) cancelAnimationFrame(animFrameId);
-        animFrameId = requestAnimationFrame(updatePinball);
-    }
-
-    function resetPinballState() {
+function drawPinball() {
+    pbCtx.clearRect(0, 0, 320, 400);
+    pbCtx.fillStyle = "#1e293b";
+    pbCtx.fillRect(0, 0, 320, 400);
+    
+    pbCtx.beginPath();
+    pbCtx.arc(pbBall.x, pbBall.y, pbBall.radius, 0, Math.PI * 2);
+    pbCtx.fillStyle = "#38bdf8";
+    pbCtx.fill();
+}
+function launchPinballClick() {
+    if (pbIsMoving) return;
+    if (pbBallsLeft <= 0) { pbScore = 0; pbBallsLeft = 5; }
+    pbBallsLeft--;
+    document.getElementById('pbBalls').innerText = pbBallsLeft;
+    pbBall.x = 297; pbBall.y = 350; pbBall.vx = -1; pbBall.vy = -12;
+    pbIsMoving = true;
+    animPinball();
+}
+function animPinball() {
+    if (!pbIsMoving) return;
+    pbBall.vy += 0.2; pbBall.x += pbBall.vx; pbBall.y += pbBall.vy;
+    if (pbBall.x < 10 || pbBall.x > 310) pbBall.vx = -pbBall.vx;
+    if (pbBall.y > 380) {
         pbIsMoving = false;
-        pbBall.x = 297; pbBall.y = 360; pbBall.vx = 0; pbBall.vy = 0;
-        drawPinball();
-
-        if (pbBallsLeft === 0) {
-            document.getElementById('pbLaunchBtn').innerText = "🔄 點擊再玩一次";
-            setTimeout(() => showCustomAlert(`🎉 本局結束！總得分：${pbScore} 分！`), 150);
-        }
+        pbScore += 100;
+        document.getElementById('pbScore').innerText = pbScore;
     }
+    drawPinball();
+    if (pbIsMoving) requestAnimationFrame(animPinball);
+}
 
-    /* ==========================================================================
-       GAME 4: MEMORY GAME LOGIC
-       ========================================================================== */
-    const memEmojis = ['🐶', '🐱', '🐼', '🦊', '🐸', '🦁', '🦄', '🐵'];
-    let flippedCards = [];
-    let memMatchedCount = 0;
-    let memMoves = 0;
-    let memTimer = null;
-    let memSeconds = 0;
+/* ===== 4. 記憶翻牌 ===== */
+const memEmojis = ['🐶', '🐱', '🐼', '🦊', '🐸', '🦁', '🦄', '🐵'];
+let flippedCards = [];
+let memTimer = null, memSeconds = 0, memMoves = 0;
 
-    function initMemoryGame() {
-        clearInterval(memTimer);
-        memSeconds = 0;
-        memMoves = 0;
-        memMatchedCount = 0;
-        flippedCards = [];
-        document.getElementById('memTime').innerText = '0';
-        document.getElementById('memMoves').innerText = '0';
-        document.getElementById('memStatus').innerText = '';
+function initMemoryGame() {
+    clearInterval(memTimer);
+    memSeconds = 0; memMoves = 0; flippedCards = [];
+    document.getElementById('memTime').innerText = '0';
+    document.getElementById('memMoves').innerText = '0';
+    
+    const boardEl = document.getElementById('memoryBoard');
+    boardEl.innerHTML = '';
+    let cards = [...memEmojis, ...memEmojis].sort(() => Math.random() - 0.5);
 
-        const boardEl = document.getElementById('memoryBoard');
-        boardEl.innerHTML = '';
-
-        let cardData = [...memEmojis, ...memEmojis];
-        cardData.sort(() => Math.random() - 0.5);
-
-        cardData.forEach((emoji, index) => {
-            const card = document.createElement('div');
-            card.className = 'card-flip';
-            card.dataset.emoji = emoji;
-            card.dataset.index = index;
-
-            card.innerHTML = `
-                <div class="card-inner">
-                    <div class="card-front">❓</div>
-                    <div class="card-back">${emoji}</div>
-                </div>
-            `;
-
-            card.onclick = () => flipMemoryCard(card);
-            boardEl.appendChild(card);
-        });
-
-        memTimer = setInterval(() => {
-            memSeconds++;
-            document.getElementById('memTime').innerText = memSeconds;
-        }, 1000);
-    }
-
-    function flipMemoryCard(card) {
-        if (flippedCards.length >= 2 || card.classList.contains('flipped') || card.classList.contains('matched')) return;
-
-        card.classList.add('flipped');
-        flippedCards.push(card);
-
-        if (flippedCards.length === 2) {
-            memMoves++;
-            document.getElementById('memMoves').innerText = memMoves;
-
-            const [card1, card2] = flippedCards;
-            if (card1.dataset.emoji === card2.dataset.emoji) {
-                card1.classList.add('matched');
-                card2.classList.add('matched');
-                flippedCards = [];
-                memMatchedCount += 2;
-
-                if (navigator.vibrate) navigator.vibrate(30);
-
-                if (memMatchedCount === memEmojis.length * 2) {
-                    clearInterval(memTimer);
-                    document.getElementById('memStatus').innerText = `🎉 恭喜通關！耗時 ${memSeconds} 秒，共 ${memMoves} 步！`;
+    cards.forEach((emoji) => {
+        const card = document.createElement('div');
+        card.className = 'card-flip';
+        card.innerHTML = `<div class="card-inner"><div class="card-front">❓</div><div class="card-back">${emoji}</div></div>`;
+        card.onclick = () => {
+            if (flippedCards.length < 2 && !card.classList.contains('flipped')) {
+                card.classList.add('flipped');
+                flippedCards.push(card);
+                if (flippedCards.length === 2) {
+                    memMoves++;
+                    document.getElementById('memMoves').innerText = memMoves;
+                    const [c1, c2] = flippedCards;
+                    if (c1.querySelector('.card-back').innerText === c2.querySelector('.card-back').innerText) {
+                        flippedCards = [];
+                    } else {
+                        setTimeout(() => { c1.classList.remove('flipped'); c2.classList.remove('flipped'); flippedCards = []; }, 700);
+                    }
                 }
-            } else {
-                setTimeout(() => {
-                    card1.classList.remove('flipped');
-                    card2.classList.remove('flipped');
-                    flippedCards = [];
-                }, 800);
             }
-        }
-    }
-
-    /* ==========================================================================
-       GAME 5: SNAKE LOGIC
-       ========================================================================== */
-    const snakeCanvas = document.getElementById('snakeCanvas');
-    const snakeCtx = snakeCanvas.getContext('2d');
-    const gridSize = 15;
-    const tileCount = 20;
-
-    let snake = [{x: 10, y: 10}];
-    let snakeFood = {x: 5, y: 5};
-    let snakeDir = {x: 1, y: 0};
-    let nextSnakeDir = {x: 1, y: 0};
-    let snakeScore = 0;
-    let snakeHighScore = localStorage.getItem('arcade_snake_high') || 0;
-    let snakeGameInterval = null;
-    let isSnakeRunning = false;
-
-    document.getElementById('snakeHighScore').innerText = snakeHighScore;
-
-    function drawSnake() {
-        snakeCtx.fillStyle = "#020617";
-        snakeCtx.fillRect(0, 0, snakeCanvas.width, snakeCanvas.height);
-
-        // 繪製網格線
-        snakeCtx.strokeStyle = "rgba(255, 255, 255, 0.03)";
-        for(let i=0; i<tileCount; i++) {
-            snakeCtx.beginPath();
-            snakeCtx.moveTo(i * gridSize, 0); snakeCtx.lineTo(i * gridSize, 300);
-            snakeCtx.moveTo(0, i * gridSize); snakeCtx.lineTo(300, i * gridSize);
-            snakeCtx.stroke();
-        }
-
-        // 食物
-        snakeCtx.fillStyle = "#f43f5e";
-        snakeCtx.beginPath();
-        snakeCtx.arc(snakeFood.x * gridSize + gridSize/2, snakeFood.y * gridSize + gridSize/2, gridSize/2 - 1, 0, Math.PI*2);
-        snakeCtx.fill();
-
-        // 蛇身
-        snake.forEach((segment, index) => {
-            snakeCtx.fillStyle = index === 0 ? "#38bdf8" : "#818cf8";
-            snakeCtx.beginPath();
-            snakeCtx.roundRect(segment.x * gridSize + 1, segment.y * gridSize + 1, gridSize - 2, gridSize - 2, 4);
-            snakeCtx.fill();
-        });
-    }
-
-    function updateSnake() {
-        snakeDir = {...nextSnakeDir};
-        const head = {x: snake[0].x + snakeDir.x, y: snake[0].y + snakeDir.y};
-
-        // 撞牆死
-        if (head.x < 0 || head.x >= tileCount || head.y < 0 || head.y >= tileCount) {
-            return handleSnakeGameOver();
-        }
-
-        // 撞自身死
-        if (snake.some(s => s.x === head.x && s.y === head.y)) {
-            return handleSnakeGameOver();
-        }
-
-        snake.unshift(head);
-
-        // 吃到食物
-        if (head.x === snakeFood.x && head.y === snakeFood.y) {
-            snakeScore += 10;
-            document.getElementById('snakeScore').innerText = snakeScore;
-            if (snakeScore > snakeHighScore) {
-                snakeHighScore = snakeScore;
-                localStorage.setItem('arcade_snake_high', snakeHighScore);
-                document.getElementById('snakeHighScore').innerText = snakeHighScore;
-            }
-            spawnSnakeFood();
-            if (navigator.vibrate) navigator.vibrate(20);
-        } else {
-            snake.pop();
-        }
-
-        drawSnake();
-    }
-
-    function spawnSnakeFood() {
-        snakeFood = {
-            x: Math.floor(Math.random() * tileCount),
-            y: Math.floor(Math.random() * tileCount)
         };
-        if (snake.some(s => s.x === snakeFood.x && s.y === snakeFood.y)) spawnSnakeFood();
-    }
-
-    function changeSnakeDir(dir) {
-        if (dir === 'UP' && snakeDir.y === 0) nextSnakeDir = {x: 0, y: -1};
-        if (dir === 'DOWN' && snakeDir.y === 0) nextSnakeDir = {x: 0, y: 1};
-        if (dir === 'LEFT' && snakeDir.x === 0) nextSnakeDir = {x: -1, y: 0};
-        if (dir === 'RIGHT' && snakeDir.x === 0) nextSnakeDir = {x: 1, y: 0};
-    }
-
-    function toggleSnakeGame() {
-        const btn = document.getElementById('snakeStartBtn');
-        if (isSnakeRunning) {
-            pauseSnakeGame();
-            btn.innerText = "▶️ 繼續遊戲";
-        } else {
-            if (snake.length === 1 && snakeScore === 0) resetSnakeState();
-            isSnakeRunning = true;
-            snakeGameInterval = setInterval(updateSnake, 130);
-            btn.innerText = "⏸️ 暫停遊戲";
-        }
-    }
-
-    function pauseSnakeGame() {
-        isSnakeRunning = false;
-        clearInterval(snakeGameInterval);
-    }
-
-    function handleSnakeGameOver() {
-        pauseSnakeGame();
-        if (navigator.vibrate) navigator.vibrate([80, 40, 80]);
-        showCustomAlert(`💥 遊戲結束！最終得分：${snakeScore} 分`);
-        resetSnakeState();
-        document.getElementById('snakeStartBtn').innerText = "▶️ 開始遊戲";
-    }
-
-    function resetSnakeState() {
-        snake = [{x: 10, y: 10}];
-        snakeDir = {x: 1, y: 0};
-        nextSnakeDir = {x: 1, y: 0};
-        snakeScore = 0;
-        document.getElementById('snakeScore').innerText = "0";
-        spawnSnakeFood();
-        drawSnake();
-    }
-
-    /* ==========================================================================
-       GAME 6: PONG LOGIC
-       ========================================================================== */
-    const pongCanvas = document.getElementById('pongCanvas');
-    const pongCtx = pongCanvas.getContext('2d');
-
-    let pongMode = 'AI'; // 'AI' or 'PVP'
-    let p1Score = 0, p2Score = 0;
-    let paddleWidth = 70, paddleHeight = 10;
-    let p1X = 115, p2X = 115;
-    let ball = { x: 150, y: 180, vx: 3, vy: 4, radius: 6 };
-    let isPongRunning = false;
-    let pongAnimId = null;
-
-    function setPongMode(mode) {
-        pongMode = mode;
-        document.getElementById('modeAiBtn').classList.toggle('active', mode === 'AI');
-        document.getElementById('modePvpBtn').classList.toggle('active', mode === 'PVP');
-        document.getElementById('pongP2Label').innerText = mode === 'AI' ? 'AI' : '玩家 2';
-        document.getElementById('pvpControls').style.display = mode === 'PVP' ? 'block' : 'none';
-        resetPongMatch();
-    }
-
-    function drawPong() {
-        pongCtx.clearRect(0, 0, pongCanvas.width, pongCanvas.height);
-
-        pongCtx.fillStyle = "#090d16";
-        pongCtx.fillRect(0, 0, pongCanvas.width, pongCanvas.height);
-
-        // 中線
-        pongCtx.strokeStyle = "rgba(255,255,255,0.1)";
-        pongCtx.setLineDash([6, 6]);
-        pongCtx.beginPath();
-        pongCtx.moveTo(0, 180); pongCtx.lineTo(300, 180);
-        pongCtx.stroke();
-        pongCtx.setLineDash([]);
-
-        // P1 擋板 (藍)
-        pongCtx.fillStyle = "#38bdf8";
-        pongCtx.beginPath();
-        pongCtx.roundRect(p1X, 345, paddleWidth, paddleHeight, 5);
-        pongCtx.fill();
-
-        // P2 擋板 (紅/紫)
-        pongCtx.fillStyle = "#f43f5e";
-        pongCtx.beginPath();
-        pongCtx.roundRect(p2X, 5, paddleWidth, paddleHeight, 5);
-        pongCtx.fill();
-
-        // 乒乓球
-        pongCtx.fillStyle = "#facc15";
-        pongCtx.beginPath();
-        pongCtx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
-        pongCtx.fill();
-    }
-
-    function updatePong() {
-        if (!isPongRunning) return;
-
-        ball.x += ball.vx;
-        ball.y += ball.vy;
-
-        // 左右牆壁碰撞
-        if (ball.x - ball.radius < 0 || ball.x + ball.radius > 300) {
-            ball.vx = -ball.vx;
-        }
-
-        // AI 自動追球 logic
-        if (pongMode === 'AI') {
-            let targetX = ball.x - paddleWidth / 2;
-            p2X += (targetX - p2X) * 0.085;
-        }
-
-        // P2 (頂部) 反彈
-        if (ball.y - ball.radius <= 15) {
-            if (ball.x >= p2X && ball.x <= p2X + paddleWidth) {
-                ball.vy = Math.abs(ball.vy) * 1.03; // 加速
-                let hitPos = (ball.x - (p2X + paddleWidth / 2)) / (paddleWidth / 2);
-                ball.vx = hitPos * 5;
-                if (navigator.vibrate) navigator.vibrate(10);
-            } else if (ball.y < 0) {
-                p1Score++;
-                document.getElementById('pongP1Score').innerText = p1Score;
-                resetPongBall();
-            }
-        }
-
-        // P1 (底部) 反彈
-        if (ball.y + ball.radius >= 345) {
-            if (ball.x >= p1X && ball.x <= p1X + paddleWidth) {
-                ball.vy = -Math.abs(ball.vy) * 1.03;
-                let hitPos = (ball.x - (p1X + paddleWidth / 2)) / (paddleWidth / 2);
-                ball.vx = hitPos * 5;
-                if (navigator.vibrate) navigator.vibrate(10);
-            } else if (ball.y > 360) {
-                p2Score++;
-                document.getElementById('pongP2Score').innerText = p2Score;
-                resetPongBall();
-            }
-        }
-
-        drawPong();
-        pongAnimId = requestAnimationFrame(updatePong);
-    }
-
-    function resetPongBall() {
-        ball.x = 150; ball.y = 180;
-        ball.vx = (Math.random() > 0.5 ? 1 : -1) * (2.5 + Math.random() * 2);
-        ball.vy = (Math.random() > 0.5 ? 1 : -1) * 3.5;
-    }
-
-    function resetPongMatch() {
-        p1Score = 0; p2Score = 0;
-        document.getElementById('pongP1Score').innerText = '0';
-        document.getElementById('pongP2Score').innerText = '0';
-        resetPongBall();
-        drawPong();
-    }
-
-    function togglePongGame() {
-        const btn = document.getElementById('pongStartBtn');
-        if (isPongRunning) {
-            pausePongGame();
-            btn.innerText = "🏓 繼續遊戲";
-        } else {
-            isPongRunning = true;
-            pongAnimId = requestAnimationFrame(updatePong);
-            btn.innerText = "⏸️ 暫停對決";
-        }
-    }
-
-    function pausePongGame() {
-        isPongRunning = false;
-        if (pongAnimId) cancelAnimationFrame(pongAnimId);
-    }
-
-    // 觸控板 Drag 操控機制
-    pongCanvas.addEventListener('touchmove', (e) => {
-        e.preventDefault();
-        const rect = pongCanvas.getBoundingClientRect();
-        const touch = e.touches[0];
-        const touchY = touch.clientY - rect.top;
-        const touchX = touch.clientX - rect.left - paddleWidth / 2;
-
-        if (touchY > 180) {
-            p1X = Math.max(0, Math.min(300 - paddleWidth, touchX));
-        } else if (pongMode === 'PVP') {
-            p2X = Math.max(0, Math.min(300 - paddleWidth, touchX));
-        }
-    }, { passive: false });
-
-    pongCanvas.addEventListener('mousemove', (e) => {
-        const rect = pongCanvas.getBoundingClientRect();
-        const touchX = e.clientX - rect.left - paddleWidth / 2;
-        p1X = Math.max(0, Math.min(300 - paddleWidth, touchX));
+        boardEl.appendChild(card);
     });
 
-    // 鍵盤支援 (貪食蛇與通用操控)
-    window.addEventListener('keydown', (e) => {
-        if (e.key === 'ArrowLeft') changeSnakeDir('LEFT');
-        if (e.key === 'ArrowRight') changeSnakeDir('RIGHT');
-        if (e.key === 'ArrowUp') changeSnakeDir('UP');
-        if (e.key === 'ArrowDown') changeSnakeDir('DOWN');
-    });
+    memTimer = setInterval(() => { memSeconds++; document.getElementById('memTime').innerText = memSeconds; }, 1000);
+}
 
-    // 初始化應用與所有遊戲 Canvas
-    window.onload = function() {
-        loadData();
-        initMinesGame();
-        drawPinball();
-        drawSnake();
-        drawPong();
-    };
-    </script>
+/* ===== 5. 賽博貪食蛇 ===== */
+const snakeCanvas = document.getElementById('snakeCanvas');
+const snakeCtx = snakeCanvas.getContext('2d');
+let snake = [{x: 10, y: 10}], snakeDir = {x: 1, y: 0}, snakeFood = {x: 5, y: 5};
+let snakeScore = 0, snakeInterval = null, isSnakeRunning = false;
+
+function drawSnake() {
+    snakeCtx.fillStyle = "#020617";
+    snakeCtx.fillRect(0, 0, 300, 300);
+    
+    snakeCtx.fillStyle = "#f43f5e";
+    snakeCtx.fillRect(snakeFood.x * 15, snakeFood.y * 15, 13, 13);
+
+    snakeCtx.fillStyle = "#38bdf8";
+    snake.forEach(s => snakeCtx.fillRect(s.x * 15, s.y * 15, 13, 13));
+}
+function updateSnake() {
+    const head = {x: snake[0].x + snakeDir.x, y: snake[0].y + snakeDir.y};
+    if (head.x < 0 || head.x >= 20 || head.y < 0 || head.y >= 20) return pauseSnakeGame();
+    snake.unshift(head);
+    if (head.x === snakeFood.x && head.y === snakeFood.y) {
+        snakeScore += 10;
+        document.getElementById('snakeScore').innerText = snakeScore;
+        snakeFood = {x: Math.floor(Math.random()*20), y: Math.floor(Math.random()*20)};
+    } else { snake.pop(); }
+    drawSnake();
+}
+function changeSnakeDir(dir) {
+    if (dir==='UP' && snakeDir.y===0) snakeDir={x:0, y:-1};
+    if (dir==='DOWN' && snakeDir.y===0) snakeDir={x:0, y:1};
+    if (dir==='LEFT' && snakeDir.x===0) snakeDir={x:-1, y:0};
+    if (dir==='RIGHT' && snakeDir.x===0) snakeDir={x:1, y:0};
+}
+function toggleSnakeGame() {
+    if (isSnakeRunning) pauseSnakeGame();
+    else {
+        isSnakeRunning = true;
+        snakeInterval = setInterval(updateSnake, 130);
+    }
+}
+function pauseSnakeGame() { isSnakeRunning = false; clearInterval(snakeInterval); }
+
+/* ===== 6. 霓虹桌球 ===== */
+const pongCanvas = document.getElementById('pongCanvas');
+const pongCtx = pongCanvas.getContext('2d');
+let pongBall = {x: 150, y: 180, vx: 2, vy: 3}, p1X = 115, isPongRunning = false, pongAnim = null;
+
+function drawPong() {
+    pongCtx.clearRect(0, 0, 300, 360);
+    pongCtx.fillStyle = "#090d16";
+    pongCtx.fillRect(0, 0, 300, 360);
+
+    pongCtx.fillStyle = "#38bdf8";
+    pongCtx.fillRect(p1X, 345, 70, 8);
+
+    pongCtx.fillStyle = "#facc15";
+    pongCtx.beginPath(); pongCtx.arc(pongBall.x, pongBall.y, 6, 0, Math.PI*2); pongCtx.fill();
+}
+function updatePong() {
+    if (!isPongRunning) return;
+    pongBall.x += pongBall.vx; pongBall.y += pongBall.vy;
+    if (pongBall.x < 5 || pongBall.x > 295) pongBall.vx = -pongBall.vx;
+    if (pongBall.y < 5 || pongBall.y > 350) pongBall.vy = -pongBall.vy;
+    drawPong();
+    if (isPongRunning) pongAnim = requestAnimationFrame(updatePong);
+}
+function togglePongGame() {
+    if (isPongRunning) pausePongGame();
+    else { isPongRunning = true; pongAnim = requestAnimationFrame(updatePong); }
+}
+function pausePongGame() { isPongRunning = false; cancelAnimationFrame(pongAnim); }
+
+// 初始化系統
+loadData();
+</script>
+
+<!-- PWA Service Worker Registration -->
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch(() => {});
+  });
+}
+</script>
 </body>
 </html>
