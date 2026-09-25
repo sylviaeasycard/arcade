@@ -265,52 +265,20 @@
         .chip { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); padding: 2px 6px; border-radius: 10px; font-size: 0.72rem; display: flex; align-items: center; gap: 4px; }
         .chip-remove { color: var(--neon-pink); }
 
-        /* ===== 修復踩地雷變形與黑化樣式 ===== */
-        #minesGrid {
-            display: grid;
-            gap: 4px;
-            width: 300px;
-            max-width: 100%;
-            background: #0f172a;
-            padding: 8px;
-            border-radius: 12px;
-            border: 2px solid #334155;
-            box-shadow: inset 0 0 10px rgba(0,0,0,0.8);
-        }
-
+        /* ===== 踩地雷 ===== */
+        #minesGrid { display: grid; gap: 4px; width: 280px; }
         .mine-cell {
-            aspect-ratio: 1; /* 嚴格固定 1:1 正方形 */
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, #334155, #1e293b);
-            border: 1px solid #475569;
+            background: rgba(30, 41, 59, 0.9);
+            border: 1px solid var(--card-border);
             border-radius: 6px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.9rem;
-            font-weight: 900;
+            font-size: 0.85rem;
+            font-weight: 700;
             cursor: pointer;
-            box-shadow: inset 1px 1px 2px rgba(255,255,255,0.2), 0 2px 4px rgba(0,0,0,0.3);
-            overflow: hidden; /* 防止文字溢出擠壓 */
-            line-height: 1;
         }
-
-        .mine-cell:active {
-            transform: scale(0.92);
-        }
-
-        .mine-cell.revealed {
-            background: #020617 !important;
-            border-color: #1e293b !important;
-            box-shadow: inset 2px 2px 4px rgba(0,0,0,0.8) !important;
-        }
-
-        /* 經典數字顏色 */
-        .c-1 { color: #38bdf8; }
-        .c-2 { color: #4ade80; }
-        .c-3 { color: #f43f5e; }
-        .c-4 { color: #a855f7; }
+        .mine-cell.revealed { background: rgba(15, 23, 42, 0.9); border-color: rgba(255,255,255,0.05); }
 
         /* ===== 記憶對對碰 ===== */
         #memoryBoard { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; width: 280px; height: 280px; }
@@ -419,7 +387,7 @@
             </div>
         </section>
 
-        <!-- ===== 3. 夜市彈珠台 (經典木質重構) ===== -->
+        <!-- ===== 3. 夜市彈珠台 ===== -->
         <section id="game-pinball" class="view-page">
             <div class="game-stage">
                 <div class="status-panel">
@@ -427,12 +395,12 @@
                     <span>剩餘球數: <span id="pbBalls" class="status-val">5</span></span>
                 </div>
                 <div class="canvas-box">
-                    <canvas id="pinballCanvas" width="320" height="420"></canvas>
+                    <canvas id="pinballCanvas" width="280" height="380"></canvas>
                 </div>
                 <div class="ctrl-panel">
-                    <span style="font-size:0.75rem; color:var(--text-muted); align-self:center;">拉桿力道:</span>
-                    <input type="range" id="pbPowerRange" min="10" max="22" value="16" style="width:90px; align-self:center;">
-                    <button class="tech-btn pink" onclick="launchPinball()">🚀 發射彈珠！</button>
+                    <span style="font-size:0.75rem; color:var(--text-muted); align-self:center;">力道:</span>
+                    <input type="range" id="pbPowerRange" min="10" max="22" value="16" style="width:80px; align-self:center;">
+                    <button class="tech-btn pink" onclick="launchPinball()">🚀 發射球！</button>
                 </div>
             </div>
         </section>
@@ -607,7 +575,7 @@ function startSpin() {
     requestAnimationFrame(animate);
 }
 
-/* ===== 2. 踩坑避雷 (完全重寫樣式與防止變形) ===== */
+/* ===== 2. 踩坑避雷 ===== */
 let minesSize = 6, mineCount = 5;
 let minesBoard = [], isFlagMode = false, minesGameOver = false;
 
@@ -654,10 +622,13 @@ function initMinesGame() {
         }
     }
 
+    let cellSize = Math.floor(280 / minesSize) - 4;
     for (let r = 0; r < minesSize; r++) {
         for (let c = 0; c < minesSize; c++) {
             const cell = document.createElement('div');
             cell.className = 'mine-cell';
+            cell.style.width = cellSize + 'px';
+            cell.style.height = cellSize + 'px';
             cell.id = `cell-${r}-${c}`;
             cell.onclick = () => handleCellClick(r, c);
             grid.appendChild(cell);
@@ -686,11 +657,8 @@ function handleCellClick(r, c) {
         el.innerText = "💥"; el.style.background = "#ef4444";
         document.getElementById('minesStatus').innerText = "💥 踩雷了！遊戲結束！";
     } else {
-        if (item.count > 0) {
-            el.innerText = item.count;
-            el.classList.add(`c-${item.count}`);
-        } else {
-            // 連鎖展開空格子
+        if (item.count > 0) el.innerText = item.count;
+        else {
             for (let dr = -1; dr <= 1; dr++) {
                 for (let dc = -1; dc <= 1; dc++) {
                     let nr = r + dr, nc = c + dc;
@@ -703,96 +671,70 @@ function handleCellClick(r, c) {
     }
 }
 
-/* ===== 3. 夜市彈珠台 (經典木質風格重構) ===== */
+/* ===== 3. 夜市彈珠台 ===== */
 const pbCanvas = document.getElementById('pinballCanvas');
 const pbCtx = pbCanvas.getContext('2d');
-let pbScore = 0, pbBalls = 5, pbIsMoving = false;
-let pbBall = { x: 302, y: 380, vx: 0, vy: 0, r: 6 };
+let pbScore = 0, pbBalls = 3, pbIsMoving = false;
+let pbBall = { x: 260, y: 350, vx: 0, vy: 0, r: 8 };
 
-// 生成經典夜市彈珠台的金屬釘陣列
-const pbPins = [];
-for (let row = 0; row < 6; row++) {
-    let cols = row % 2 === 0 ? 6 : 5;
-    let startX = row % 2 === 0 ? 30 : 50;
-    for (let col = 0; col < cols; col++) {
-        pbPins.push({ x: startX + col * 45, y: 120 + row * 32, r: 4 });
-    }
-}
+const pbObstacles = [
+    { x: 80, y: 120, r: 16, pts: 100 },
+    { x: 140, y: 80, r: 16, pts: 200 },
+    { x: 200, y: 120, r: 16, pts: 100 },
+    { x: 110, y: 180, r: 16, pts: 500 },
+    { x: 170, y: 180, r: 16, pts: 500 },
+];
 
 function resetPinball() {
-    pbBall = { x: 302, y: 380, vx: 0, vy: 0, r: 6 };
+    pbBall = { x: 260, y: 350, vx: 0, vy: 0, r: 8 };
     pbIsMoving = false;
     drawPinball();
 }
 
 function drawPinball() {
-    pbCtx.clearRect(0, 0, 320, 420);
-    
-    // 1. 木質背景台面
-    pbCtx.fillStyle = "#2d1b0e";
-    pbCtx.fillRect(0, 0, 320, 420);
+    pbCtx.clearRect(0, 0, 280, 380);
+    pbCtx.fillStyle = "#020617";
+    pbCtx.fillRect(0, 0, 280, 380);
 
-    // 2. 邊框與頂部圓弧頂棚
-    pbCtx.strokeStyle = "#8b5a2b";
-    pbCtx.lineWidth = 8;
-    pbCtx.strokeRect(4, 4, 312, 412);
+    pbCtx.strokeStyle = "rgba(56, 189, 248, 0.4)";
+    pbCtx.lineWidth = 2;
+    pbCtx.strokeRect(10, 10, 260, 360);
 
-    pbCtx.beginPath();
-    pbCtx.arc(140, 90, 130, Math.PI, 0);
-    pbCtx.strokeStyle = "#a76d37";
-    pbCtx.lineWidth = 6;
-    pbCtx.stroke();
+    // 軌道
+    pbCtx.beginPath(); pbCtx.moveTo(240, 10); pbCtx.lineTo(240, 370);
+    pbCtx.strokeStyle = "rgba(255, 255, 255, 0.15)"; pbCtx.stroke();
 
-    // 3. 右側彈珠發射通道軌道
-    pbCtx.beginPath();
-    pbCtx.moveTo(285, 90);
-    pbCtx.lineTo(285, 420);
-    pbCtx.strokeStyle = "#8b5a2b";
-    pbCtx.lineWidth = 4;
-    pbCtx.stroke();
-
-    // 4. 金屬障礙釘 Pins
-    pbPins.forEach(pin => {
-        pbCtx.beginPath();
-        pbCtx.arc(pin.x, pin.y, pin.r, 0, Math.PI * 2);
-        pbCtx.fillStyle = "#facc15";
-        pbCtx.fill();
-        pbCtx.strokeStyle = "#fff";
-        pbCtx.lineWidth = 1;
-        pbCtx.stroke();
+    // 障礙物
+    pbObstacles.forEach(obs => {
+        pbCtx.beginPath(); pbCtx.arc(obs.x, obs.y, obs.r, 0, Math.PI * 2);
+        pbCtx.fillStyle = "#a855f7"; pbCtx.fill();
+        pbCtx.strokeStyle = "#fff"; pbCtx.stroke();
     });
 
-    // 5. 底部木頭得分分流分隔板與分級
-    const scores = ['100', '200', '500', '200', '100'];
-    for(let i=0; i<=5; i++) {
-        pbCtx.fillStyle = "#8b5a2b";
-        pbCtx.fillRect(10 + i * 53, 340, 4, 70);
-    }
+    // 底部得分區
+    const slots = ['100', '500', '1000', '500', '100'];
     for(let i=0; i<5; i++) {
-        pbCtx.font = "bold 12px Orbitron";
-        pbCtx.fillStyle = "#f1f5f9";
-        pbCtx.fillText(scores[i], 20 + i * 53, 380);
+        pbCtx.fillStyle = "rgba(255,255,255,0.05)";
+        pbCtx.fillRect(10 + i * 46, 320, 42, 45);
+        pbCtx.font = "bold 10px Orbitron";
+        pbCtx.fillStyle = "#facc15";
+        pbCtx.fillText(slots[i], 18 + i * 46, 345);
     }
 
-    // 6. 彈珠本體
-    pbCtx.beginPath();
-    pbCtx.arc(pbBall.x, pbBall.y, pbBall.r, 0, Math.PI * 2);
-    pbCtx.fillStyle = "#38bdf8";
-    pbCtx.fill();
-    pbCtx.strokeStyle = "#ffffff";
-    pbCtx.lineWidth = 2;
-    pbCtx.stroke();
+    // 球
+    pbCtx.beginPath(); pbCtx.arc(pbBall.x, pbBall.y, pbBall.r, 0, Math.PI * 2);
+    pbCtx.fillStyle = "#38bdf8"; pbCtx.fill();
 }
 
 function launchPinball() {
     if (pbIsMoving) return;
-    if (pbBalls <= 0) { pbBalls = 5; pbScore = 0; }
+    if (pbBalls <= 0) { pbBalls = 3; pbScore = 0; }
     pbBalls--;
     document.getElementById('pbBalls').innerText = pbBalls;
     document.getElementById('pbScore').innerText = pbScore;
 
     const power = parseFloat(document.getElementById('pbPowerRange').value);
-    pbBall = { x: 302, y: 370, vx: 0, vy: -power, r: 6 };
+    pbBall = { x: 250, y: 340, vx: 0, vy: -power, r: 8 };
     pbIsMoving = true;
     animPinball();
 }
@@ -800,44 +742,38 @@ function launchPinball() {
 function animPinball() {
     if (!pbIsMoving) return;
 
-    pbBall.vy += 0.28; // 重力加速度
+    pbBall.vy += 0.25; // 重力
     pbBall.x += pbBall.vx;
     pbBall.y += pbBall.vy;
 
-    // 頂部圓弧軌道引導
-    if (pbBall.y < 90 && pbBall.x > 140) {
-        let dx = pbBall.x - 140, dy = pbBall.y - 90;
-        let dist = Math.sqrt(dx*dx + dy*dy);
-        if (dist > 124) {
-            pbBall.vx -= 0.8; // 順著頂部圓弧向左彎曲
-        }
-    }
+    // 頂部彎道
+    if (pbBall.y < 30 && pbBall.x > 180) { pbBall.vx -= 0.6; }
 
-    // 左邊界與右軌道牆碰撞
-    if (pbBall.x - pbBall.r < 10) { pbBall.x = 10 + pbBall.r; pbBall.vx = -pbBall.vx * 0.7; }
-    if (pbBall.x + pbBall.r > 280 && pbBall.y > 90) { pbBall.x = 280 - pbBall.r; pbBall.vx = -pbBall.vx * 0.7; }
-    if (pbBall.y - pbBall.r < 10) { pbBall.y = 10 + pbBall.r; pbBall.vy = -pbBall.vy * 0.7; }
+    // 牆壁碰撞
+    if (pbBall.x - pbBall.r < 10) { pbBall.x = 10 + pbBall.r; pbBall.vx = -pbBall.vx * 0.8; }
+    if (pbBall.x + pbBall.r > 270) { pbBall.x = 270 - pbBall.r; pbBall.vx = -pbBall.vx * 0.8; }
+    if (pbBall.y - pbBall.r < 10) { pbBall.y = 10 + pbBall.r; pbBall.vy = -pbBall.vy * 0.8; }
 
-    // 撞擊金屬釘（Pins）隨機彈跳
-    pbPins.forEach(pin => {
-        let dx = pbBall.x - pin.x, dy = pbBall.y - pin.y;
+    // 撞擊障礙物
+    pbObstacles.forEach(obs => {
+        let dx = pbBall.x - obs.x, dy = pbBall.y - obs.y;
         let dist = Math.sqrt(dx*dx + dy*dy);
-        if (dist < pbBall.r + pin.r) {
-            pbBall.vx = (dx / dist) * (3 + Math.random() * 2);
-            pbBall.vy = (dy / dist) * (3 + Math.random() * 2);
-            pbScore += 10;
+        if (dist < pbBall.r + obs.r) {
+            pbBall.vx = (dx / dist) * 4;
+            pbBall.vy = (dy / dist) * 4;
+            pbScore += obs.pts;
             document.getElementById('pbScore').innerText = pbScore;
         }
     });
 
-    // 掉入底部分隔洞口
-    if (pbBall.y > 360) {
+    // 掉落底部
+    if (pbBall.y > 330) {
         pbIsMoving = false;
-        let idx = Math.floor((pbBall.x - 10) / 53);
-        const map = [100, 200, 500, 200, 100];
+        let idx = Math.floor((pbBall.x - 10) / 46);
+        const map = [100, 500, 1000, 500, 100];
         if (idx >= 0 && idx < 5) pbScore += map[idx];
         document.getElementById('pbScore').innerText = pbScore;
-        setTimeout(resetPinball, 800);
+        setTimeout(resetPinball, 1000);
         return;
     }
 
