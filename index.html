@@ -263,7 +263,7 @@
 
         .chip-container { display: flex; flex-wrap: wrap; gap: 4px; max-height: 50px; overflow-y: auto; width: 100%; padding: 2px; }
         .chip { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); padding: 2px 6px; border-radius: 10px; font-size: 0.72rem; display: flex; align-items: center; gap: 4px; }
-        .chip-remove { color: var(--neon-pink); }
+        .chip-remove { color: var(--neon-pink); cursor: pointer; }
 
         /* ===== 踩地雷 ===== */
         #minesGrid { display: grid; gap: 4px; width: 280px; }
@@ -291,7 +291,7 @@
 
         /* D-Pad 按鈕 */
         .dpad { display: grid; grid-template-columns: repeat(3, 38px); grid-template-rows: repeat(2, 38px); gap: 3px; }
-        .dpad-btn { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #fff; border-radius: 6px; font-size: 1rem; display: flex; align-items: center; justify-content: center; }
+        .dpad-btn { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #fff; border-radius: 6px; font-size: 1rem; display: flex; align-items: center; justify-content: center; cursor: pointer; }
         .dpad-btn:active { background: var(--neon-blue); color: #000; }
     </style>
 </head>
@@ -392,7 +392,7 @@
             <div class="game-stage">
                 <div class="status-panel">
                     <span>得分: <span id="pbScore" class="status-val">0</span></span>
-                    <span>剩餘球數: <span id="pbBalls" class="status-val">5</span></span>
+                    <span>剩餘球數: <span id="pbBalls" class="status-val">3</span></span>
                 </div>
                 <div class="canvas-box">
                     <canvas id="pinballCanvas" width="280" height="380"></canvas>
@@ -675,7 +675,7 @@ function handleCellClick(r, c) {
 const pbCanvas = document.getElementById('pinballCanvas');
 const pbCtx = pbCanvas.getContext('2d');
 let pbScore = 0, pbBalls = 3, pbIsMoving = false;
-let pbBall = { x: 260, y: 350, vx: 0, vy: 0, r: 8 };
+let pbBall = { x: 250, y: 340, vx: 0, vy: 0, r: 8 };
 
 const pbObstacles = [
     { x: 80, y: 120, r: 16, pts: 100 },
@@ -686,7 +686,7 @@ const pbObstacles = [
 ];
 
 function resetPinball() {
-    pbBall = { x: 260, y: 350, vx: 0, vy: 0, r: 8 };
+    pbBall = { x: 250, y: 340, vx: 0, vy: 0, r: 8 };
     pbIsMoving = false;
     drawPinball();
 }
