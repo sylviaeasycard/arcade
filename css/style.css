@@ -720,3 +720,13 @@ input {
 
 /* 平板 / 電腦：一個畫面的版面不要拉得太高 */
 @media (min-height: 1000px) { .fit-panel { max-height: 900px; } }
+
+/* 打地鼠結算明細 */
+.whack-result { display: flex; flex-direction: column; gap: 8px; font-size: 1.05rem; }
+.wr-row { display: flex; justify-content: space-between; align-items: center; padding: 0 4px; }
+.wr-row b { font-variant-numeric: tabular-nums; }
+.wr-bad b { color: #fb7185; }
+.wr-total { margin-top: 4px; padding-top: 10px; border-top: 1px solid var(--line-2); font-size: 1.25rem; }
+.wr-total b { color: var(--amber); font-size: 1.5rem; }
+.wr-note { margin-top: 6px; font-weight: 800; color: var(--emerald); }
+.wr-sub { margin-top: -4px; font-size: 0.78rem; color: var(--muted); text-align: right; }

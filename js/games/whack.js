@@ -19,6 +19,7 @@
     const cfg = Object.assign({ speed: 'slow' }, A.store.get('whack_cfg', {}));
     let loop, els = {}, holes = [];
     let t = 0, nextSpawn = 0, score = 0, running = false, playing = false;
+    let goodHits = 0, badHits = 0, penalty = 0; // 明細用
     let lastSec = -1;
 
     const saveCfg = () => A.store.set('whack_cfg', cfg);
@@ -92,6 +93,7 @@
         loop && loop.stop();
         playing = false; running = false;
         t = 0; nextSpawn = 400; score = 0; lastSec = -1;
+        goodHits = 0; badHits = 0; penalty = 0;
         holes.forEach(h => { h.kind = null; h.hitUntil = 0; });
         els.score.textContent = '0';
         els.time.textContent = ROUND_MS / 1000;
@@ -161,10 +163,14 @@
         if (!running || !h.kind) return;
         if (h.kind === 'good') {
             score += 1;
+            goodHits++;
             h.hitFace = '💥';
             A.buzz(15);
         } else {
+            const before = score;
             score = Math.max(0, score - 2);
+            badHits++;
+            penalty += before - score; // 實際扣掉的分數（分數最低 0）
             h.hitFace = '😾';
             A.buzz([60, 40, 60]);
         }
@@ -186,16 +192,27 @@
         A.store.set(lastKey(), score);
         if (score > best) A.store.set(bestKey(), score);
 
-        let msg = `時間到！這局打到 ${score} 分`;
-        if (score > best && best > 0) msg += '\n🏆 刷新最高紀錄！';
-        else if (last !== null && score > last) msg += `\n👍 比上一局進步 ${score - last} 分！`;
-        else if (last !== null && score === last) msg += '\n跟上一局一樣，穩定發揮！';
-        else if (last !== null) msg += '\n再來一局，一定可以更好！';
+        let note = '';
+        if (score > best && best > 0) note = '🏆 刷新最高紀錄！';
+        else if (last !== null && score > last) note = `👍 比上一局進步 ${score - last} 分！`;
+        else if (last !== null && score === last) note = '跟上一局一樣，穩定發揮！';
+        else if (last !== null) note = '再來一局，一定可以更好！';
+
+        // 明細表
+        const hasCat = SPEEDS[cfg.speed].cat > 0;
+        const body = A.h(`
+            <div class="whack-result">
+                <div class="wr-row"><span>打中包子 ${GOOD}</span><b>${goodHits} 個</b></div>
+                ${hasCat ? `<div class="wr-row wr-bad"><span>誤打小貓 ${BAD}</span><b>${badHits} 次（−${penalty}）</b></div>` : ''}
+                ${hasCat && penalty < badHits * 2 ? `<div class="wr-sub">（分數最低是 0，當時分數不夠扣，所以只扣了 ${penalty} 分）</div>` : ''}
+                <div class="wr-row wr-total"><span>總分</span><b>${score} 分</b></div>
+                ${note ? `<div class="wr-note">${note}</div>` : ''}
+            </div>`);
 
         els.start.textContent = '🔄 再玩一局';
         syncUI();
         A.buzz([50, 50, 120]);
-        A.alert(msg, score > best ? '🏆' : '🥟');
+        A.modal({ icon: score > best ? '🏆' : '🥟', title: `時間到！（${SPEEDS[cfg.speed].label}）`, body });
     }
 
     A.register({
