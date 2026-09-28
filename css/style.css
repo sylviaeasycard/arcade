@@ -730,3 +730,15 @@ input {
 .wr-total b { color: var(--amber); font-size: 1.5rem; }
 .wr-note { margin-top: 6px; font-weight: 800; color: var(--emerald); }
 .wr-sub { margin-top: -4px; font-size: 0.78rem; color: var(--muted); text-align: right; }
+
+/* 美食輪盤結果 */
+.wheel-pick {
+    padding: 14px 8px;
+    font-size: 2rem;
+    font-weight: 900;
+    color: var(--amber);
+    border-radius: 14px;
+    background: rgba(2, 6, 23, 0.7);
+    border: 1px solid rgba(244, 63, 94, 0.35);
+    word-break: break-all;
+}

@@ -9,7 +9,7 @@
     const FONT = '-apple-system, "PingFang TC", "Noto Sans TC", "Microsoft JhengHei", sans-serif';
 
     let options = A.store.get('food_options', null) || DEFAULTS.slice();
-    let ctx, chipsEl, resultEl, inputEl;
+    let ctx, chipsEl, spinBtn, inputEl;
     let angle = 0;
     let spinning = false;
 
@@ -24,7 +24,6 @@
                         <canvas class="wheel-canvas" width="${SIZE}" height="${SIZE}" aria-label="美食輪盤，點一下旋轉"></canvas>
                     </div>
                 </div>
-                <div class="wheel-result">🔮 晚餐吃什麼？轉轉看！</div>
                 <div class="row" style="flex-wrap:nowrap">
                     <button class="btn btn-big btn-sunset grow spin-btn">🎯 旋轉！</button>
                     <button class="btn edit-btn" style="align-self:stretch">✏️ 改菜單</button>
@@ -33,7 +32,7 @@
 
         const canvas = el.querySelector('canvas');
         ctx = canvas.getContext('2d');
-        resultEl = el.querySelector('.wheel-result');
+        spinBtn = el.querySelector('.spin-btn');
         const wrap = el.querySelector('.wheel-wrap');
         A.fitInto(el.querySelector('.wheel-area'), 1, w => { wrap.style.width = Math.min(w - 12, 420) + 'px'; });
 
@@ -145,7 +144,7 @@
     function spin() {
         if (spinning || options.length < 2) return;
         spinning = true;
-        resultEl.textContent = '🔮 命運旋轉中...';
+        spinBtn.textContent = '🔮 轉動中…';
 
         const startAngle = angle % (Math.PI * 2);
         const total = Math.PI * 10 + Math.random() * Math.PI * 4;
@@ -165,12 +164,26 @@
         requestAnimationFrame(animate);
     }
 
+    // 依現在時間決定是哪一餐
+    function mealName() {
+        const h = new Date().getHours();
+        if (h >= 5 && h < 10) return '早餐';
+        if (h >= 10 && h < 14) return '午餐';
+        if (h >= 14 && h < 17) return '下午茶';
+        if (h >= 17 && h < 21) return '晚餐';
+        return '宵夜';
+    }
+
     function showResult() {
         const n = options.length;
         const arc = (Math.PI * 2) / n;
         const norm = (1.5 * Math.PI - (angle % (Math.PI * 2)) + Math.PI * 4) % (Math.PI * 2);
         const idx = Math.floor(norm / arc) % n;
-        resultEl.textContent = `🎉 今晚就吃：${options[idx]}！`;
+        spinBtn.textContent = '🎯 旋轉！';
+        // 結果用小框顯示，按「確定」關閉
+        const body = A.h('<div class="wheel-pick"></div>');
+        body.textContent = options[idx];
+        A.modal({ icon: '🎉', title: `${mealName()}就吃`, body });
         A.buzz([40, 40, 80]);
     }
 
@@ -178,7 +191,7 @@
         id: 'wheel',
         name: '美食輪盤',
         icon: '🍕',
-        desc: '晚餐吃什麼？讓幸運大輪盤替你決定',
+        desc: '這餐吃什麼？讓幸運大輪盤替你決定',
         tag: '休閒',
         color: '#f97316',
         mount,
