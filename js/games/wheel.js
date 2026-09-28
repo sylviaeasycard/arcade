@@ -9,7 +9,7 @@
     const FONT = '-apple-system, "PingFang TC", "Noto Sans TC", "Microsoft JhengHei", sans-serif';
 
     let options = A.store.get('food_options', null) || DEFAULTS.slice();
-    let ctx, chipsEl, spinBtn, inputEl;
+    let ctx, chipsEl, spinBtn, inputEl, countEl, moreEl;
     let angle = 0;
     let spinning = false;
 
@@ -51,13 +51,30 @@
                     <input class="input" maxlength="12" placeholder="例如：🧋 珍珠奶茶" enterkeyhint="done">
                     <button class="btn btn-emerald" type="submit">新增</button>
                 </form>
-                <div class="chips"></div>
+                <div class="chips-count label"></div>
+                <div class="chips editor-chips"></div>
+                <div class="chips-more">⬇️ 往下滑還有更多</div>
             </div>`);
         chipsEl = body.querySelector('.chips');
         inputEl = body.querySelector('.input');
+        countEl = body.querySelector('.chips-count');
+        moreEl = body.querySelector('.chips-more');
+        chipsEl.addEventListener('scroll', updateMore);
         body.querySelector('.add-form').onsubmit = e => { e.preventDefault(); addOption(); };
         renderChips();
-        A.modal({ icon: '✏️', title: '編輯菜單', body, buttons: [{ label: '完成', value: true, primary: true }] });
+        A.modal({
+            icon: '✏️', title: '編輯菜單', body,
+            // 輸入框還有字就直接幫忙新增，不用先按「新增」
+            buttons: [{ label: '完成', value: () => { addOption(); return true; }, primary: true }]
+        });
+        requestAnimationFrame(updateMore);
+    }
+
+    // 清單超出高度時，提示「往下滑還有更多」（手機的捲軸平常是隱藏的）
+    function updateMore() {
+        if (!moreEl) return;
+        const hidden = chipsEl.scrollHeight - chipsEl.clientHeight - chipsEl.scrollTop > 4;
+        moreEl.style.visibility = hidden ? 'visible' : 'hidden';
     }
 
     function renderChips() {
@@ -68,6 +85,8 @@
             chip.querySelector('.chip-remove').onclick = () => removeOption(i);
             chipsEl.append(chip);
         });
+        if (countEl) countEl.textContent = `目前共 ${options.length} 項`;
+        requestAnimationFrame(updateMore);
     }
 
     function addOption() {
@@ -76,6 +95,7 @@
         options.push(val);
         inputEl.value = '';
         save(); renderChips(); draw();
+        chipsEl.scrollTop = chipsEl.scrollHeight; // 捲到最下面，看得到剛加的那一項
     }
 
     function removeOption(i) {

@@ -742,3 +742,21 @@ input {
     border: 1px solid rgba(244, 63, 94, 0.35);
     word-break: break-all;
 }
+
+/* 編輯菜單：清單最多佔半個螢幕，超出時顯示提示 */
+.modal { max-height: calc(100svh - 32px); overflow-y: auto; }
+.editor-chips { max-height: 42svh; }
+.chips-count { margin-bottom: -4px; }
+.chips-more {
+    margin-top: -6px;
+    text-align: center;
+    font-size: 0.85rem;
+    font-weight: 800;
+    color: var(--amber);
+    visibility: hidden;
+}
+
+/* 彈珠台拉桿 */
+.pb-canvas { touch-action: none; -webkit-touch-callout: none; }
+.pb-tip { font-size: 0.95rem; color: var(--muted); line-height: 1.4; }
+.pb-tip b { color: var(--amber); }
