@@ -4,7 +4,8 @@
    ========================================================================== */
 (() => {
     const A = Arcade;
-    const W = 325, H = 410;
+    const W = 325, H = 380;
+    const OFFSET = 30; // 畫面往上裁掉 30，頂部空白比較少（物理座標不變）
     const TOTAL_BALLS = 5;
 
     const PEGS = [
@@ -22,35 +23,34 @@
         { x: 226, width: 52, score: 50,  label: '50分',  color: '#6366f1' }
     ];
 
-    let ctx, loop, els = {};
+    let ctx, loop, els = {}, canvasEl, dpr = 1;
     let score = 0, ballsLeft = TOTAL_BALLS, moving = false;
     const ball = { x: 297, y: 360, r: 7, vx: 0, vy: 0 };
     let landed = [];
 
     function mount(el) {
         el.append(A.h(`
-            <div class="panel split">
-                <div class="canvas-box"><canvas aria-label="彈珠台"></canvas></div>
-                <div class="side stack">
-                    <p class="hint">調整發射力道，拉得越滿彈珠飛得越高！中間的 300 分最難進。</p>
-                    <div class="stats">
-                        <div class="stat"><span class="stat-label">目前總分</span><span class="stat-value score" style="color:var(--amber)">0</span></div>
-                        <div class="stat"><span class="stat-label">剩餘彈珠</span><span class="stat-value balls" style="color:var(--sky)">${TOTAL_BALLS}</span></div>
-                    </div>
-                    <div class="subpanel stack">
-                        <div class="row" style="justify-content:space-between">
-                            <span class="label">🚀 發射力道</span>
-                            <span class="label power-val" style="color:var(--rose)">75%</span>
-                        </div>
-                        <input type="range" class="range power" min="10" max="100" value="75" aria-label="發射力道">
-                    </div>
-                    <button class="btn btn-big btn-block btn-amber launch-btn">🚀 強力發射！</button>
-                    <div class="label best-line" style="text-align:center"></div>
+            <div class="panel fit-panel">
+                <div class="fit-grow pb-area">
+                    <div class="canvas-box"><canvas aria-label="彈珠台，點一下發射"></canvas></div>
                 </div>
+                <div class="stats three compact">
+                    <div class="stat"><span class="stat-label">總分</span><span class="stat-value score" style="color:var(--amber)">0</span></div>
+                    <div class="stat"><span class="stat-label">剩餘彈珠</span><span class="stat-value balls" style="color:var(--sky)">${TOTAL_BALLS}</span></div>
+                    <div class="stat"><span class="stat-label">最高</span><span class="stat-value best" style="color:var(--emerald)">0</span></div>
+                </div>
+                <div class="row power-row">
+                    <span class="label">🚀 力道</span>
+                    <input type="range" class="range grow power" min="10" max="100" value="75" aria-label="發射力道">
+                    <span class="label power-val" style="color:var(--rose);min-width:3em;text-align:right">75%</span>
+                </div>
+                <button class="btn btn-big btn-block btn-amber launch-btn">🚀 發射！</button>
             </div>`));
 
         const canvas = el.querySelector('canvas');
-        ctx = A.setupCanvas(canvas, W, H, 400);
+        canvasEl = canvas;
+        ctx = A.setupCanvas(canvas, W, H, 420);
+        dpr = canvas.width / W;
         loop = A.createLoop(step, draw);
 
         els.score = el.querySelector('.score');
@@ -58,7 +58,8 @@
         els.power = el.querySelector('.power');
         els.powerVal = el.querySelector('.power-val');
         els.launch = el.querySelector('.launch-btn');
-        els.best = el.querySelector('.best-line');
+        els.best = el.querySelector('.best');
+        A.fitInto(el.querySelector('.pb-area'), W / H, (w) => { canvas.style.width = Math.max(160, w - 18) + 'px'; }, 18);
 
         els.power.oninput = () => { els.powerVal.textContent = els.power.value + '%'; };
         els.launch.onclick = launch;
@@ -69,7 +70,7 @@
 
     function showBest() {
         const b = A.store.get('pinball_best', 0);
-        els.best.textContent = b ? `🏆 最高紀錄 ${b} 分` : '';
+        els.best.textContent = b;
     }
 
     function drawBall(x, y) {
@@ -87,8 +88,10 @@
     }
 
     function draw() {
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
         ctx.fillStyle = '#1c1512';
-        ctx.fillRect(0, 0, W, H);
+        ctx.fillRect(0, 0, canvasEl.width, canvasEl.height);
+        ctx.setTransform(dpr, 0, 0, dpr, 0, -OFFSET * dpr);
 
         // 發射通道
         ctx.strokeStyle = 'rgba(255,255,255,0.2)';
@@ -150,9 +153,9 @@
             ball.vx = -Math.abs(ball.vx) * 0.8;
             ball.x = 275 - ball.r;
         }
-        if (ball.y - ball.r < 8) {
+        if (ball.y - ball.r < 8 + OFFSET) {
             ball.vy = Math.abs(ball.vy) * 0.5;
-            ball.y = 8 + ball.r;
+            ball.y = 8 + OFFSET + ball.r;
             ball.vx = -(4 + Math.random() * 4);
         }
 

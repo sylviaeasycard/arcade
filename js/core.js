@@ -154,6 +154,20 @@ window.Arcade = (() => {
         return { x: (clientX - r.left) * w / r.width, y: (clientY - r.top) * h / r.height };
     }
 
+    // 在 container 裡放一個固定比例（寬/高 = aspect）的東西，盡量放大但不超出
+    // pad：內容物外框（padding + border）的總厚度
+    function fitInto(container, aspect, apply, pad = 0) {
+        const ro = new ResizeObserver(() => {
+            const r = container.getBoundingClientRect();
+            if (!r.width || !r.height) return;
+            let w = r.width, h = (w - pad) / aspect + pad;
+            if (h > r.height) { h = r.height; w = (h - pad) * aspect + pad; }
+            apply(Math.floor(w), Math.floor(h));
+        });
+        ro.observe(container);
+        return ro;
+    }
+
     /* ---------- 註冊與路由 ---------- */
     function register(game) {
         games.push(game);
@@ -280,7 +294,7 @@ window.Arcade = (() => {
     return {
         register, store, buzz, h, esc, shuffle,
         modal, alert, toast,
-        createLoop, setupCanvas, toLocal,
+        createLoop, setupCanvas, toLocal, fitInto,
         get current() { return current; }
     };
 })();

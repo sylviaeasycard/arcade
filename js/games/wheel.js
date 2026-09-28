@@ -17,38 +17,48 @@
 
     function mount(el) {
         el.append(A.h(`
-            <div class="panel wheel-layout">
-                <div class="wheel-wrap">
-                    <div class="wheel-pointer"></div>
-                    <canvas class="wheel-canvas" width="${SIZE}" height="${SIZE}" aria-label="美食輪盤，點一下旋轉"></canvas>
-                </div>
-                <div class="stack">
-                    <p class="hint">選擇困難症救星！自訂夜市美食選單，點擊旋轉讓命運替你決定今晚吃什麼。</p>
-                    <div class="subpanel stack">
-                        <span class="label">新增 / 移除菜單選項</span>
-                        <form class="row add-form">
-                            <input class="input" maxlength="12" placeholder="例如：🧋 珍珠奶茶" enterkeyhint="done">
-                            <button class="btn btn-emerald" type="submit">新增</button>
-                        </form>
-                        <div class="chips"></div>
+            <div class="panel fit-panel">
+                <div class="fit-grow wheel-area">
+                    <div class="wheel-wrap">
+                        <div class="wheel-pointer"></div>
+                        <canvas class="wheel-canvas" width="${SIZE}" height="${SIZE}" aria-label="美食輪盤，點一下旋轉"></canvas>
                     </div>
-                    <div class="wheel-result">🔮 準備好後點擊下方旋轉！</div>
-                    <button class="btn btn-big btn-block btn-sunset spin-btn">🎯 旋轉大輪盤！</button>
+                </div>
+                <div class="wheel-result">🔮 晚餐吃什麼？轉轉看！</div>
+                <div class="row" style="flex-wrap:nowrap">
+                    <button class="btn btn-big btn-sunset grow spin-btn">🎯 旋轉！</button>
+                    <button class="btn edit-btn" style="align-self:stretch">✏️ 改菜單</button>
                 </div>
             </div>`));
 
         const canvas = el.querySelector('canvas');
         ctx = canvas.getContext('2d');
-        chipsEl = el.querySelector('.chips');
         resultEl = el.querySelector('.wheel-result');
-        inputEl = el.querySelector('.input');
+        const wrap = el.querySelector('.wheel-wrap');
+        A.fitInto(el.querySelector('.wheel-area'), 1, w => { wrap.style.width = Math.min(w - 12, 420) + 'px'; });
 
-        el.querySelector('.add-form').onsubmit = e => { e.preventDefault(); addOption(); };
         el.querySelector('.spin-btn').onclick = spin;
+        el.querySelector('.edit-btn').onclick = openEditor;
         canvas.onclick = spin;
-
-        renderChips();
         draw();
+    }
+
+    // 菜單編輯改成對話框，平常畫面比較乾淨
+    function openEditor() {
+        if (spinning) return;
+        const body = A.h(`
+            <div class="stack" style="text-align:left">
+                <form class="row add-form" style="flex-wrap:nowrap">
+                    <input class="input" maxlength="12" placeholder="例如：🧋 珍珠奶茶" enterkeyhint="done">
+                    <button class="btn btn-emerald" type="submit">新增</button>
+                </form>
+                <div class="chips"></div>
+            </div>`);
+        chipsEl = body.querySelector('.chips');
+        inputEl = body.querySelector('.input');
+        body.querySelector('.add-form').onsubmit = e => { e.preventDefault(); addOption(); };
+        renderChips();
+        A.modal({ icon: '✏️', title: '編輯菜單', body, buttons: [{ label: '完成', value: true, primary: true }] });
     }
 
     function renderChips() {
@@ -66,7 +76,6 @@
         if (!val) return;
         options.push(val);
         inputEl.value = '';
-        inputEl.blur();
         save(); renderChips(); draw();
     }
 

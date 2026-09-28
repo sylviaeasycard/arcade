@@ -23,8 +23,7 @@
 
     function mount(el) {
         el.append(A.h(`
-            <div class="panel stack">
-                <p class="hint">點一下翻開草叢，數字代表周圍有幾個坑。<b>長按</b>或開啟「插旗模式」可以標記坑洞。第一下一定安全！</p>
+            <div class="panel fit-panel">
                 <div class="seg size-seg">
                     ${SIZES.map(s => `<button data-size="${s}">${s}×${s}</button>`).join('')}
                     <button data-size="custom">自訂</button>
@@ -32,15 +31,21 @@
                 <div class="seg level-seg">
                     ${Object.entries(LEVELS).map(([k, v]) => `<button data-level="${k}">${v.label}</button>`).join('')}
                 </div>
-                <div class="status"></div>
-                <div class="mines-board"></div>
+                <div class="status compact"></div>
+                <div class="fit-grow mines-area"><div class="mines-board"></div></div>
                 <div class="row">
-                    <button class="btn grow flag-btn">🚩 插旗模式：關</button>
+                    <button class="btn grow flag-btn">🚩 插旗：關</button>
                     <button class="btn btn-emerald grow restart-btn">🔄 重新開局</button>
+                    <button class="btn help-btn" aria-label="玩法說明">❓</button>
                 </div>
             </div>`));
 
         els.board = el.querySelector('.mines-board');
+        A.fitInto(el.querySelector('.mines-area'), 1, w => {
+            const size = Math.min(w, 440);
+            els.board.style.width = size + 'px';
+            els.board.style.setProperty('--bs', size + 'px');
+        });
         els.status = el.querySelector('.status');
         els.flag = el.querySelector('.flag-btn');
         els.sizeBtns = [...el.querySelectorAll('.size-seg button')];
@@ -55,8 +60,20 @@
         });
         els.flag.onclick = () => { flagMode = !flagMode; syncButtons(); };
         el.querySelector('.restart-btn').onclick = init;
+        el.querySelector('.help-btn').onclick = showHelp;
 
         init();
+        if (!A.store.get('mines_seen_help', false)) {
+            A.store.set('mines_seen_help', true);
+            setTimeout(showHelp, 300);
+        }
+    }
+
+    function showHelp() {
+        A.modal({
+            icon: '🌿', title: '怎麼玩',
+            message: '點一下翻開草叢，數字代表周圍 8 格裡有幾個坑。\n覺得某格是坑，就「長按」它插上 🚩，或打開下方「🚩 插旗」再點。\n第一下一定安全！把所有不是坑的格子翻開就過關。'
+        });
     }
 
     function syncButtons() {
@@ -68,7 +85,7 @@
         });
         els.levelBtns.forEach(b => b.classList.toggle('on', b.dataset.level === cfg.level));
         els.flag.classList.toggle('on', flagMode);
-        els.flag.textContent = `🚩 插旗模式：${flagMode ? '開' : '關'}`;
+        els.flag.textContent = `🚩 插旗：${flagMode ? '開' : '關'}`;
     }
 
     async function customSize() {

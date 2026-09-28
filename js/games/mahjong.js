@@ -53,20 +53,22 @@
     /* ---------- 畫面 ---------- */
     function mount(el) {
         el.append(A.h(`
-            <div class="panel stack">
-                <p class="hint">點兩張<b>一樣的牌</b>，中間能用<b>最多轉兩個彎</b>的線連起來，就會消除。線可以從外圍繞過去。</p>
-                <div class="status mj-status"></div>
-                <div class="mj-wrap">
-                    <div class="mj-board"></div>
-                    <svg class="mj-line" aria-hidden="true"><polyline points=""/></svg>
+            <div class="panel fit-panel">
+                <div class="seg level-seg">
+                    ${Object.entries(LEVELS).map(([k, v]) => `<button data-level="${k}">${v.label}</button>`).join('')}
+                </div>
+                <div class="status compact mj-status"></div>
+                <div class="fit-grow mj-area">
+                    <div class="mj-wrap">
+                        <div class="mj-board"></div>
+                        <svg class="mj-line" aria-hidden="true"><polyline points=""/></svg>
+                    </div>
                 </div>
                 <div class="row">
                     <button class="btn grow hint-btn">💡 提示</button>
                     <button class="btn grow shuffle-btn">🔀 洗牌</button>
                     <button class="btn btn-sky grow new-btn">🔄 新局</button>
-                </div>
-                <div class="seg level-seg">
-                    ${Object.entries(LEVELS).map(([k, v]) => `<button data-level="${k}">${v.label}</button>`).join('')}
+                    <button class="btn help-btn" aria-label="玩法說明">❓</button>
                 </div>
             </div>`));
 
@@ -75,14 +77,41 @@
         els.line = el.querySelector('.mj-line polyline');
         els.svg = el.querySelector('.mj-line');
         els.status = el.querySelector('.mj-status');
+        els.area = el.querySelector('.mj-area');
         els.levelBtns = [...el.querySelectorAll('.level-seg button')];
 
         els.levelBtns.forEach(b => b.onclick = () => { cfg.level = b.dataset.level; saveCfg(); newGame(); });
         el.querySelector('.hint-btn').onclick = hint;
         el.querySelector('.shuffle-btn').onclick = () => { if (!busy) { reshuffle(); A.buzz(20); } };
         el.querySelector('.new-btn').onclick = newGame;
+        el.querySelector('.help-btn').onclick = showHelp;
 
+        new ResizeObserver(layout).observe(els.area);
         newGame();
+        if (!A.store.get('mahjong_seen_help', false)) {
+            A.store.set('mahjong_seen_help', true);
+            setTimeout(showHelp, 300);
+        }
+    }
+
+    function showHelp() {
+        A.modal({
+            icon: '🀄', title: '怎麼玩',
+            message: '點兩張一樣的牌。\n如果中間能用「最多轉兩個彎」的線連起來，兩張牌就會消失。\n線可以從牌桌外圍繞過去。\n\n找不到的時候按「💡 提示」。'
+        });
+    }
+
+    // 依照可用空間算出每張牌多大，整個牌桌剛好塞進畫面，不用捲動
+    const GAP = 4, PAD = 38; // 牌間距、牌桌內距＋邊框
+    function layout() {
+        if (!cols) return;
+        const r = els.area.getBoundingClientRect();
+        if (!r.width || !r.height) return;
+        const byW = (r.width - PAD - (cols - 1) * GAP) / cols;
+        const byH = ((r.height - PAD - (rows - 1) * GAP) / rows) * 0.75;
+        const tw = Math.max(24, Math.floor(Math.min(byW, byH, 72)));
+        els.board.style.setProperty('--tw', tw + 'px');
+        els.board.style.gridTemplateColumns = `repeat(${cols}, ${tw}px)`;
     }
 
     function newGame() {
@@ -102,6 +131,7 @@
 
         els.levelBtns.forEach(b => b.classList.toggle('on', b.dataset.level === cfg.level));
         els.board.style.setProperty('--cols', cols);
+        layout();
         els.board.innerHTML = '';
         tiles = [];
         for (let r = 0; r < rows; r++) {

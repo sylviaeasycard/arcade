@@ -24,18 +24,20 @@
 
     function mount(el) {
         el.append(A.h(`
-            <div class="panel stack">
-                <div class="status spot-status"></div>
-                <div class="spot-label">⬆️ 原本的樣子</div>
-                <div class="spot-grid spot-top"></div>
-                <div class="spot-label">⬇️ 哪裡不一樣？點它！</div>
-                <div class="spot-grid spot-bottom"></div>
+            <div class="panel fit-panel">
+                <div class="seg level-seg">
+                    ${Object.entries(LEVELS).map(([k, v]) => `<button data-level="${k}">${v.label}</button>`).join('')}
+                </div>
+                <div class="status compact spot-status"></div>
+                <div class="fit-grow spot-area">
+                    <div class="spot-label">⬆️ 原本的樣子</div>
+                    <div class="spot-grid spot-top"></div>
+                    <div class="spot-label">⬇️ 哪裡不一樣？點它！</div>
+                    <div class="spot-grid spot-bottom"></div>
+                </div>
                 <div class="row">
                     <button class="btn grow hint-btn">💡 提示</button>
                     <button class="btn btn-sky grow new-btn">🔄 換一題</button>
-                </div>
-                <div class="seg level-seg">
-                    ${Object.entries(LEVELS).map(([k, v]) => `<button data-level="${k}">${v.label}</button>`).join('')}
                 </div>
             </div>`));
 
@@ -43,12 +45,26 @@
         els.top = el.querySelector('.spot-top');
         els.bottom = el.querySelector('.spot-bottom');
         els.levelBtns = [...el.querySelectorAll('.level-seg button')];
+        els.area = el.querySelector('.spot-area');
+        new ResizeObserver(sizeGrids).observe(els.area);
 
         els.levelBtns.forEach(b => b.onclick = () => { cfg.level = b.dataset.level; saveCfg(); newPuzzle(); });
         el.querySelector('.hint-btn').onclick = hint;
         el.querySelector('.new-btn').onclick = newPuzzle;
 
         newPuzzle();
+    }
+
+    // 兩張圖一起塞進可用空間
+    function sizeGrids() {
+        const r = els.area.getBoundingClientRect();
+        if (!r.width || !r.height) return;
+        const labels = [...els.area.querySelectorAll('.spot-label')].reduce((s, l) => s + l.offsetHeight, 0);
+        const size = Math.floor(Math.min(r.width, (r.height - labels - 18) / 2, 420));
+        [els.top, els.bottom].forEach(g => {
+            g.style.width = size + 'px';
+            g.style.setProperty('--gs', size + 'px');
+        });
     }
 
     function newPuzzle() {

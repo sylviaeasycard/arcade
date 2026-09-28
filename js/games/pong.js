@@ -28,10 +28,7 @@
 
     function mount(el) {
         el.append(A.h(`
-            <div class="panel split">
-                <div class="canvas-box"><canvas class="pong-canvas" aria-label="乒乓球場"></canvas></div>
-                <div class="side stack">
-                    <p class="hint">左右滑動螢幕下半部控制藍色擋板，先拿到 ${WIN_SCORE} 分的人獲勝！</p>
+            <div class="panel fit-panel">
                     <div class="seg mode-seg">
                         <button data-mode="AI">🤖 人機對戰</button>
                         <button data-mode="PVP">👥 雙人對打</button>
@@ -39,24 +36,25 @@
                     <div class="seg speed-seg">
                         ${Object.entries(SPEEDS).map(([k, v]) => `<button data-speed="${k}">${v.label}</button>`).join('')}
                     </div>
-                    <div class="stats">
-                        <div class="stat"><span class="stat-label" style="color:var(--sky)">玩家 1（下）</span><span class="stat-value s1" style="color:var(--sky)">0</span></div>
-                        <div class="stat"><span class="stat-label p2-label" style="color:var(--rose)">AI（上）</span><span class="stat-value s2" style="color:var(--rose)">0</span></div>
+                    <div class="fit-grow pong-area">
+                        <div class="canvas-box"><canvas class="pong-canvas" aria-label="乒乓球場"></canvas></div>
                     </div>
-                    <button class="btn btn-big btn-block btn-rose start-btn">🏓 開始對決</button>
-                    <p class="hint pvp-hint" style="text-align:center">💡 雙人模式：上方玩家滑上半部，下方玩家滑下半部。</p>
-                </div>
+                    <div class="row" style="flex-wrap:nowrap">
+                        <div class="stat grow"><span class="stat-label" style="color:var(--sky)">你（下）</span><span class="stat-value s1" style="color:var(--sky)">0</span></div>
+                        <div class="stat grow"><span class="stat-label p2-label" style="color:var(--rose)">AI（上）</span><span class="stat-value s2" style="color:var(--rose)">0</span></div>
+                        <button class="btn btn-rose start-btn" style="flex:1.4;align-self:stretch;font-size:1.05rem">🏓 開始</button>
+                    </div>
             </div>`));
 
         canvas = el.querySelector('canvas');
-        ctx = A.setupCanvas(canvas, W, H, 380);
+        ctx = A.setupCanvas(canvas, W, H, 420);
+        A.fitInto(el.querySelector('.pong-area'), W / H, w => { canvas.style.width = Math.max(160, w - 18) + 'px'; }, 18);
         loop = A.createLoop(step, draw);
 
         els.s1 = el.querySelector('.s1');
         els.s2 = el.querySelector('.s2');
         els.p2Label = el.querySelector('.p2-label');
         els.start = el.querySelector('.start-btn');
-        els.pvpHint = el.querySelector('.pvp-hint');
         els.modeBtns = [...el.querySelectorAll('.mode-seg button')];
         els.speedBtns = [...el.querySelectorAll('.speed-seg button')];
 
@@ -88,7 +86,7 @@
         els.modeBtns.forEach(b => b.classList.toggle('on', b.dataset.mode === cfg.mode));
         els.speedBtns.forEach(b => b.classList.toggle('on', b.dataset.speed === cfg.speed));
         els.p2Label.textContent = cfg.mode === 'AI' ? 'AI（上）' : '玩家 2（上）';
-        els.pvpHint.style.display = cfg.mode === 'PVP' ? '' : 'none';
+        els.s1.previousElementSibling.textContent = cfg.mode === 'AI' ? '你（下）' : '玩家 1（下）';
         els.s1.textContent = p1;
         els.s2.textContent = p2;
     }
@@ -119,6 +117,15 @@
         ctx.beginPath();
         ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI * 2);
         ctx.fill();
+
+        if (!running) {
+            ctx.fillStyle = 'rgba(148,163,184,0.9)';
+            ctx.font = 'bold 14px -apple-system, "PingFang TC", sans-serif';
+            ctx.textAlign = 'center';
+            const tip = cfg.mode === 'AI' ? '👆 手指在下半部左右滑，控制藍色擋板' : '上下兩人各滑自己那一半';
+            ctx.fillText(tip, W / 2, H * 0.75);
+            ctx.fillText(`先拿到 ${WIN_SCORE} 分獲勝`, W / 2, H * 0.75 + 22);
+        }
     }
 
     function hitPaddle(paddleX, dir) {
@@ -199,14 +206,14 @@
         p1X = p2X = (W - PW) / 2;
         serve();
         syncUI();
-        els.start.textContent = '🏓 開始對決';
+        els.start.textContent = '🏓 開始';
         draw();
     }
 
     function toggle() {
         if (running) {
             pause();
-            els.start.textContent = '▶️ 繼續對決';
+            els.start.textContent = '▶️ 繼續';
         } else {
             running = true;
             loop.start();
@@ -229,7 +236,7 @@
         mount,
         enter: () => draw(),
         leave() {
-            if (running) { pause(); els.start.textContent = '▶️ 繼續對決'; }
+            if (running) { pause(); els.start.textContent = '▶️ 繼續'; }
         },
         onKey(e) {
             if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {

@@ -22,17 +22,16 @@
 
     function mount(el) {
         el.append(A.h(`
-            <div class="panel stack">
-                <p class="hint">考驗記憶力！翻開兩張相同的萌寵圖案就配對成功，用越少步數越厲害。</p>
+            <div class="panel fit-panel">
                 <div class="seg level-seg">
                     ${Object.entries(LEVELS).map(([k, v]) => `<button data-level="${k}">${v.label}</button>`).join('')}
                 </div>
-                <div class="stats three">
+                <div class="stats three compact">
                     <div class="stat time-stat"><span class="stat-label">⏱️ 時間</span><span class="stat-value time" style="color:var(--amber)">0</span></div>
                     <div class="stat"><span class="stat-label">🐾 步數</span><span class="stat-value moves" style="color:var(--sky)">0</span></div>
                     <div class="stat"><span class="stat-label">🏅 最少步數</span><span class="stat-value best" style="color:var(--emerald)">—</span></div>
                 </div>
-                <div class="memory-board"></div>
+                <div class="fit-grow mem-area"><div class="memory-board"></div></div>
                 <div class="mem-status"></div>
                 <div class="row">
                     <button class="btn grow timer-btn"></button>
@@ -41,6 +40,8 @@
             </div>`));
 
         els.board = el.querySelector('.memory-board');
+        els.area = el.querySelector('.mem-area');
+        new ResizeObserver(sizeBoard).observe(els.area);
         els.time = el.querySelector('.time');
         els.timeStat = el.querySelector('.time-stat');
         els.moves = el.querySelector('.moves');
@@ -64,6 +65,20 @@
         els.best.textContent = best || '—';
     }
 
+    // 依可用空間決定每張牌多大，整個牌面不用捲動
+    function sizeBoard() {
+        const r = els.area.getBoundingClientRect();
+        if (!r.width || !r.height) return;
+        const lv = LEVELS[cfg.level];
+        const rowsN = lv.pairs * 2 / lv.cols, G = 10, P = 22;
+        const card = Math.floor(Math.min(
+            (r.width - P - (lv.cols - 1) * G) / lv.cols,
+            (r.height - P - (rowsN - 1) * G) / rowsN,
+            110));
+        els.board.style.width = (card * lv.cols + (lv.cols - 1) * G + P) + 'px';
+        els.board.style.setProperty('--card', card + 'px');
+    }
+
     function startTimer() {
         if (timer || !started || done) return;
         timer = setInterval(() => { secs++; els.time.textContent = secs; }, 1000);
@@ -83,6 +98,7 @@
         const deck = A.shuffle([...picks, ...picks]);
 
         els.board.style.setProperty('--cols', lv.cols);
+        sizeBoard();
         els.board.innerHTML = '';
         deck.forEach(emoji => {
             const card = A.h(`

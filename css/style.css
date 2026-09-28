@@ -136,7 +136,8 @@ input {
     display: flex;
     align-items: center;
     gap: 10px;
-    margin-bottom: 12px;
+    height: 46px;
+    margin-bottom: 10px;
 }
 .back-btn {
     flex: none;
@@ -188,6 +189,30 @@ input {
     .split { flex-direction: row; align-items: flex-start; justify-content: center; }
     .split > .side { width: 300px; flex: none; }
 }
+
+/* 一個畫面塞得下的版面：面板高度＝螢幕高度扣掉上方返回列，中間區塊自動縮放 */
+.fit-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 12px;
+    height: calc(100vh - var(--safe-t) - var(--safe-b) - 98px);
+    height: calc(100svh - var(--safe-t) - var(--safe-b) - 98px);
+    min-height: 460px;
+}
+.fit-panel > * { flex: none; }
+.fit-panel > .fit-grow {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.status.compact { padding: 6px 10px; font-size: 0.88rem; }
+.stats.compact .stat { padding: 6px 4px; }
+.stats.compact .stat-value { font-size: 1.3rem; }
+.power-row { flex-wrap: nowrap; }
+.power-row .range { flex: 1; min-width: 0; }
 
 /* ---------- 按鈕 ---------- */
 .btn {
@@ -366,8 +391,7 @@ input {
 .wheel-wrap {
     position: relative;
     width: 100%;
-    max-width: 400px;
-    margin: 0 auto;
+    margin: 12px auto 0;
     aspect-ratio: 1;
 }
 .wheel-canvas { display: block; width: 100%; height: 100%; border-radius: 50%; cursor: pointer; }
@@ -410,11 +434,11 @@ input {
     background: rgba(244, 63, 94, 0.2);
 }
 .wheel-result {
-    min-height: 56px;
+    min-height: 50px;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 10px;
+    padding: 8px;
     font-size: clamp(1.05rem, 4.6vw, 1.5rem);
     font-weight: 900;
     text-align: center;
@@ -423,13 +447,7 @@ input {
     background: rgba(2, 6, 23, 0.8);
     border: 1px solid rgba(244, 63, 94, 0.3);
 }
-@media (min-width: 760px) {
-    .wheel-layout { display: flex; gap: 24px; align-items: center; }
-    .wheel-layout > .wheel-wrap { flex: 1; }
-    .wheel-layout > .stack { flex: 1; }
-}
-.wheel-layout > .stack { margin-top: 16px; }
-@media (min-width: 760px) { .wheel-layout > .stack { margin-top: 0; } }
+
 
 /* --- 踩坑避雷 --- */
 .mines-board {
@@ -455,7 +473,7 @@ input {
     min-height: 0;
     line-height: 1;
     font-weight: 900;
-    font-size: calc(min(100vw - 72px, 420px) / var(--n) * 0.48);
+    font-size: calc(var(--bs, 360px) / var(--n) * 0.46);
     color: #fff;
     border-radius: 8px;
     background: linear-gradient(135deg, #10b981, #059669);
@@ -473,8 +491,6 @@ input {
     display: grid;
     grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
     gap: 10px;
-    width: 100%;
-    max-width: 440px;
     margin: 0 auto;
     padding: 10px;
     border-radius: 16px;
@@ -497,7 +513,7 @@ input {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: clamp(1.7rem, 9vw, 2.6rem);
+    font-size: calc(var(--card, 80px) * 0.55);
     border-radius: 12px;
     -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
@@ -517,7 +533,7 @@ input {
     background: linear-gradient(135deg, #065f46, #059669);
     border-color: #34d399;
 }
-.mem-status { min-height: 24px; text-align: center; font-weight: 900; color: var(--emerald); }
+.mem-status { min-height: 22px; text-align: center; font-weight: 900; color: var(--emerald); }
 
 /* --- 彈珠台 / 乒乓 --- */
 .pong-canvas { touch-action: none; cursor: crosshair; }
@@ -548,7 +564,7 @@ input {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: clamp(2.6rem, 15vw, 4.2rem);
+    font-size: calc(var(--bs, 360px) / 3 * 0.55);
     line-height: 1;
     transform: translateY(105%);
     transition: transform 0.12s ease-out;
@@ -559,14 +575,14 @@ input {
 .hole.hit { border-color: #fbbf24; }
 
 /* --- 找不同 --- */
-.spot-label { font-size: 0.95rem; font-weight: 800; color: var(--muted); text-align: center; margin-bottom: -4px; }
+.spot-area { flex-direction: column; gap: 6px; }
+.spot-label { font-size: 0.9rem; font-weight: 800; color: var(--muted); text-align: center; }
 .spot-grid {
     --n: 4;
     display: grid;
     grid-template-columns: repeat(var(--n), minmax(0, 1fr));
     gap: 4px;
     width: 100%;
-    max-width: min(420px, max(250px, calc((100svh - 330px) / 2)));
     margin: 0 auto;
     padding: 6px;
     border-radius: 14px;
@@ -580,7 +596,7 @@ input {
     align-items: center;
     justify-content: center;
     border-radius: 8px;
-    font-size: calc(min(100vw - 80px, 400px) / var(--n) * 0.62);
+    font-size: calc(var(--gs, 300px) / var(--n) * 0.6);
     line-height: 1;
 }
 .spot-cell > span { display: inline-block; transition: transform 0.2s; }
@@ -610,8 +626,7 @@ input {
 /* --- 麻將連連看 --- */
 .mj-wrap {
     position: relative;
-    width: 100%;
-    max-width: 460px;
+    width: fit-content;
     margin: 0 auto;
     padding: 16px;
     border-radius: 16px;
@@ -620,7 +635,7 @@ input {
 }
 .mj-board {
     --cols: 4;
-    container-type: inline-size;
+    --tw: 48px;
     display: grid;
     grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
     gap: 4px;
@@ -631,7 +646,7 @@ input {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: calc(100cqw / var(--cols) * 0.44);
+    font-size: calc(var(--tw) * 0.44);
     font-family: "PingFang TC", "Noto Sans TC", "Microsoft JhengHei", serif;
     color: #111827;
     border-radius: 6px;
@@ -702,3 +717,6 @@ input {
     stroke-linejoin: round;
     filter: drop-shadow(0 0 4px rgba(251, 191, 36, 0.8));
 }
+
+/* 平板 / 電腦：一個畫面的版面不要拉得太高 */
+@media (min-height: 1000px) { .fit-panel { max-height: 900px; } }

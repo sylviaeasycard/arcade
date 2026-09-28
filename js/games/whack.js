@@ -27,21 +27,26 @@
 
     function mount(el) {
         el.append(A.h(`
-            <div class="panel stack">
+            <div class="panel fit-panel">
                 <div class="seg speed-seg">
                     ${Object.entries(SPEEDS).map(([k, v]) => `<button data-speed="${k}">${v.label}</button>`).join('')}
                 </div>
-                <div class="stats three">
+                <div class="stats three compact">
                     <div class="stat"><span class="stat-label">分數</span><span class="stat-value score" style="color:var(--amber)">0</span></div>
                     <div class="stat"><span class="stat-label">剩餘秒數</span><span class="stat-value time" style="color:var(--sky)">60</span></div>
                     <div class="stat"><span class="stat-label">最高</span><span class="stat-value best" style="color:var(--emerald)">0</span></div>
                 </div>
-                <div class="whack-board"></div>
+                <div class="fit-grow whack-area"><div class="whack-board"></div></div>
                 <p class="hint whack-hint" style="text-align:center"></p>
                 <button class="btn btn-big btn-block btn-sunset start-btn">▶️ 開始</button>
             </div>`));
 
         els.board = el.querySelector('.whack-board');
+        A.fitInto(el.querySelector('.whack-area'), 1, w => {
+            const size = Math.min(w, 420);
+            els.board.style.width = size + 'px';
+            els.board.style.setProperty('--bs', size + 'px');
+        });
         els.score = el.querySelector('.score');
         els.time = el.querySelector('.time');
         els.best = el.querySelector('.best');
