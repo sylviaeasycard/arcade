@@ -22,23 +22,24 @@
 
     <!-- 核心先載入，再載入各遊戲（每個遊戲自己向 Arcade 註冊） -->
     <script src="js/core.js" defer></script>
-    <script src="js/games/wheel.js" defer></script>
-    <script src="js/games/mines.js" defer></script>
-    <script src="js/games/pinball.js" defer></script>
+    <!-- 載入順序＝首頁卡片順序 -->
+    <script src="js/games/whack.js" defer></script>
     <script src="js/games/memory.js" defer></script>
+    <script src="js/games/spot.js" defer></script>
+    <script src="js/games/mahjong.js" defer></script>
+    <script src="js/games/mines.js" defer></script>
+    <script src="js/games/wheel.js" defer></script>
+    <script src="js/games/pinball.js" defer></script>
     <script src="js/games/pong.js" defer></script>
-    <script src="js/games/upcoming.js" defer></script>
 </head>
 <body>
     <div id="app">
         <!-- 遊戲大廳 -->
         <section id="lobby" class="view">
             <header class="lobby-header">
-                <h1 class="title">🍧 精於勤 • Arcade • 荒於嬉 🎯</h1>
-                <p class="subtitle">Night Market Classic Arcade — 懷舊與經典遊戲街機</p>
+                <h1 class="title">精於勤 • Arcade • 荒於嬉</h1>
             </header>
             <div id="lobbyGrid" class="lobby-grid"></div>
-            <footer class="footer">© 2026 Night Market Arcade 台灣夜市經典遊戲樂園</footer>
         </section>
 
         <!-- 各遊戲畫面由 core.js 動態建立在這裡 -->

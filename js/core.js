@@ -165,7 +165,7 @@ window.Arcade = (() => {
         const v = h(`
             <section class="view game-view" id="view-${g.id}">
                 <div class="game-bar">
-                    <button class="back-btn" aria-label="返回大廳">← 大廳</button>
+                    <button class="back-btn" aria-label="回首頁">← 回首頁</button>
                     <h2 class="game-title"></h2>
                 </div>
                 <div class="game-body"></div>
@@ -222,16 +222,12 @@ window.Arcade = (() => {
             let stat = null;
             try { stat = g.stat ? g.stat() : null; } catch (e) {}
             const card = h(`
-                <button class="game-card${g.comingSoon ? ' soon' : ''}" style="--accent:${g.color || '#38bdf8'}">
-                    ${g.comingSoon ? '<span class="badge-soon">施工中</span>' : ''}
+                <button class="game-card" style="--accent:${g.color || '#38bdf8'}">
                     <span class="card-icon">${g.icon}</span>
                     <span class="card-name">${esc(g.name)}</span>
-                    <span class="card-desc">${esc(g.desc || '')}</span>
-                    <span class="card-meta">
-                        ${g.tag ? `<span class="tag">${esc(g.tag)}</span>` : ''}
-                        ${stat ? `<span class="card-stat">${esc(stat)}</span>` : ''}
-                    </span>
+                    <span class="card-stat">${stat ? esc(stat) : ''}</span>
                 </button>`);
+            card.setAttribute('aria-label', g.name);
             card.onclick = () => {
                 if (g.comingSoon) {
                     alert(`「${g.name}」正在施工中，敬請期待！`, g.icon);

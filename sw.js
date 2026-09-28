@@ -4,7 +4,7 @@
    ‧ 一般改程式：直接推上 GitHub 就好，不用改版本號
    ‧ 有「新增 / 刪除檔案」時：更新下面的 PRECACHE 清單，並把 VERSION 加 1
    ========================================================================== */
-const VERSION = 'v2.0.0';
+const VERSION = 'v2.1.0';
 const CACHE = `arcade-${VERSION}`;
 const NETWORK_TIMEOUT = 3000;
 
@@ -14,12 +14,14 @@ const PRECACHE = [
     './manifest.json',
     './css/style.css',
     './js/core.js',
-    './js/games/wheel.js',
-    './js/games/mines.js',
-    './js/games/pinball.js',
+    './js/games/whack.js',
     './js/games/memory.js',
+    './js/games/spot.js',
+    './js/games/mahjong.js',
+    './js/games/mines.js',
+    './js/games/wheel.js',
+    './js/games/pinball.js',
     './js/games/pong.js',
-    './js/games/upcoming.js',
     './icons/icon-192.png',
     './icons/icon-512.png'
 ];
