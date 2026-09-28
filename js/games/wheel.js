@@ -43,29 +43,27 @@
     }
 
     // 菜單編輯改成對話框，平常畫面比較乾淨
+    // 新增方式：清單最後一格是「＋ 新增」，點了就變成輸入框
+    let adding = false, draft = '';
+
     function openEditor() {
         if (spinning) return;
+        adding = false; draft = '';
         const body = A.h(`
             <div class="stack" style="text-align:left">
-                <form class="row add-form" style="flex-wrap:nowrap">
-                    <input class="input" maxlength="12" placeholder="例如：🧋 珍珠奶茶" enterkeyhint="done">
-                    <button class="btn btn-emerald" type="submit">新增</button>
-                </form>
                 <div class="chips-count label"></div>
                 <div class="chips editor-chips"></div>
                 <div class="chips-more">⬇️ 往下滑還有更多</div>
             </div>`);
         chipsEl = body.querySelector('.chips');
-        inputEl = body.querySelector('.input');
         countEl = body.querySelector('.chips-count');
         moreEl = body.querySelector('.chips-more');
         chipsEl.addEventListener('scroll', updateMore);
-        body.querySelector('.add-form').onsubmit = e => { e.preventDefault(); addOption(); };
         renderChips();
         A.modal({
             icon: '✏️', title: '編輯菜單', body,
-            // 輸入框還有字就直接幫忙新增，不用先按「新增」
-            buttons: [{ label: '完成', value: () => { addOption(); return true; }, primary: true }]
+            // 輸入框還有字就直接幫忙新增，不用先按鍵盤上的「完成」
+            buttons: [{ label: '完成', value: () => { addOption(); adding = false; inputEl = null; return true; }, primary: true }]
         });
         requestAnimationFrame(updateMore);
     }
@@ -78,23 +76,64 @@
     }
 
     function renderChips() {
+        if (inputEl) draft = inputEl.value; // 重畫時保留還沒送出的字
         chipsEl.innerHTML = '';
+        inputEl = null;
         options.forEach((opt, i) => {
             const chip = A.h(`<span class="chip"><span></span><button class="chip-remove" aria-label="移除">✕</button></span>`);
             chip.firstElementChild.textContent = opt;
             chip.querySelector('.chip-remove').onclick = () => removeOption(i);
             chipsEl.append(chip);
         });
+
+        if (adding) {
+            const form = A.h(`
+                <form class="chip chip-input">
+                    <input maxlength="12" placeholder="輸入名稱" enterkeyhint="done" aria-label="新的菜名">
+                    <button type="submit" class="chip-ok" aria-label="加入">✓</button>
+                </form>`);
+            inputEl = form.querySelector('input');
+            inputEl.value = draft;
+            form.onsubmit = e => {
+                e.preventDefault();
+                if (!inputEl.value.trim()) { stopAdding(); return; }
+                addOption();              // 加完馬上再出現一格，可以一直加
+            };
+            inputEl.addEventListener('blur', () => {
+                // 空白又離開輸入框 → 變回「＋ 新增」
+                setTimeout(() => { if (adding && inputEl && !inputEl.value.trim() && document.activeElement !== inputEl) stopAdding(); }, 150);
+            });
+            chipsEl.append(form);
+        } else {
+            const add = A.h(`<button class="chip chip-add">＋ 新增</button>`);
+            add.onclick = startAdding;
+            chipsEl.append(add);
+        }
+
         if (countEl) countEl.textContent = `目前共 ${options.length} 項`;
         requestAnimationFrame(updateMore);
     }
 
+    function startAdding() {
+        adding = true; draft = '';
+        renderChips();
+        inputEl.focus();
+        chipsEl.scrollTop = chipsEl.scrollHeight;
+    }
+
+    function stopAdding() {
+        adding = false; draft = '';
+        if (chipsEl && chipsEl.isConnected) renderChips();
+    }
+
     function addOption() {
+        if (!inputEl) return;
         const val = inputEl.value.trim();
         if (!val) return;
         options.push(val);
-        inputEl.value = '';
+        inputEl.value = ''; draft = '';
         save(); renderChips(); draw();
+        if (inputEl) inputEl.focus();
         chipsEl.scrollTop = chipsEl.scrollHeight; // 捲到最下面，看得到剛加的那一項
     }
 
