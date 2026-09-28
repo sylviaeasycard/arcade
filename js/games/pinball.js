@@ -50,7 +50,7 @@
                     <div class="stat"><span class="stat-label">最高</span><span class="stat-value best" style="color:var(--emerald)">0</span></div>
                 </div>
                 <div class="row" style="flex-wrap:nowrap">
-                    <div class="pb-tip grow">👇 在台子<b>下半部往下拉</b>，放開就發射！</div>
+                    <div class="pb-tip grow">👇 <b>往下拉</b>，放開發射</div>
                     <button class="btn launch-btn" style="flex:none">🚀 發射</button>
                 </div>
             </div>`));

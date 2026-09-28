@@ -758,5 +758,6 @@ input {
 
 /* 彈珠台拉桿 */
 .pb-canvas { touch-action: none; -webkit-touch-callout: none; }
-.pb-tip { font-size: 0.95rem; color: var(--muted); line-height: 1.4; }
+.pb-tip { min-width: 0; font-size: 1rem; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .pb-tip b { color: var(--amber); }
+@media (max-width: 340px) { .pb-tip { font-size: 0.85rem; } .launch-btn { padding: 8px 10px; font-size: 0.9rem; } }
