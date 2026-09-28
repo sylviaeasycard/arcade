@@ -4,7 +4,7 @@
    ‧ 一般改程式：直接推上 GitHub 就好，不用改版本號
    ‧ 有「新增 / 刪除檔案」時：更新下面的 PRECACHE 清單，並把 VERSION 加 1
    ========================================================================== */
-const VERSION = 'v2.1.0';
+const VERSION = 'v2.2.0';
 const CACHE = `arcade-${VERSION}`;
 const NETWORK_TIMEOUT = 3000;
 
@@ -23,7 +23,8 @@ const PRECACHE = [
     './js/games/pinball.js',
     './js/games/pong.js',
     './icons/icon-192.png',
-    './icons/icon-512.png'
+    './icons/icon-512.png',
+    './icons/icon-maskable-512.png'
 ];
 
 self.addEventListener('install', e => {
