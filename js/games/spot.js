@@ -9,12 +9,15 @@
     // 轉向後看得出差別的圖案（左右對稱的不適合用「倒過來」）
     const ROTATABLE = ['🍢', '🧋', '🍡', '🍗', '🎈', '🍧', '🌽', '🍠', '🍭', '🦑', '🍤', '🎏', '🥤', '🧸'];
     const LEVELS = {
+        tiny:   { label: '超簡單', n: 3, diffs: 2, kinds: ['swap', 'gone'] },
         easy:   { label: '簡單', n: 4, diffs: 3, kinds: ['swap', 'swap', 'gone'] },
         normal: { label: '普通', n: 5, diffs: 4, kinds: ['swap', 'swap', 'gone', 'flip'] },
         hard:   { label: '困難', n: 6, diffs: 5, kinds: ['swap', 'gone', 'flip', 'small', 'turn'] }
     };
 
-    const cfg = Object.assign({ level: 'easy' }, A.store.get('spot_cfg', {}));
+    const cfg = Object.assign({ level: 'tiny' }, A.store.get('spot_cfg', {}));
+    // 新增「超簡單」後，已經玩過的人也先切到超簡單一次（之後照自己的選擇）
+    if (cfg.v !== 2) { cfg.level = 'tiny'; cfg.v = 2; A.store.set('spot_cfg', cfg); }
     let els = {};
     let base = [], diffs = new Map(), found = new Set();
     let topCells = [], botCells = [];
@@ -28,11 +31,10 @@
                 <div class="seg level-seg">
                     ${Object.entries(LEVELS).map(([k, v]) => `<button data-level="${k}">${v.label}</button>`).join('')}
                 </div>
-                <div class="status compact spot-status"></div>
                 <div class="fit-grow spot-area">
-                    <div class="spot-label">⬆️ 原本的樣子</div>
+                    <div class="spot-label">⬆️ 原圖</div>
                     <div class="spot-grid spot-top"></div>
-                    <div class="spot-label">⬇️ 哪裡不一樣？點它！</div>
+                    <div class="spot-label spot-status"></div>
                     <div class="spot-grid spot-bottom"></div>
                 </div>
                 <div class="row">
@@ -60,7 +62,7 @@
         const r = els.area.getBoundingClientRect();
         if (!r.width || !r.height) return;
         const labels = [...els.area.querySelectorAll('.spot-label')].reduce((s, l) => s + l.offsetHeight, 0);
-        const size = Math.floor(Math.min(r.width, (r.height - labels - 18) / 2, 420));
+        const size = Math.floor(Math.min(r.width, (r.height - labels - 12) / 2, 460));
         [els.top, els.bottom].forEach(g => {
             g.style.width = size + 'px';
             g.style.setProperty('--gs', size + 'px');
@@ -125,6 +127,7 @@
         if (diffs.has(idx)) {
             if (found.has(idx)) return;
             found.add(idx);
+            [topCells[idx], botCells[idx]].forEach(c => c.classList.remove('hinting'));
             topCells[idx].classList.add('found');
             botCells[idx].classList.add('found');
             A.buzz(30);
@@ -146,18 +149,19 @@
         [topCells[idx], botCells[idx]].forEach(c => {
             c.classList.remove('hinting');
             void c.offsetWidth;
-            c.classList.add('hinting');
+            c.classList.add('hinting');   // 亮黃色閃三下
         });
+        A.buzz([60, 80, 60, 80, 60]);
     }
 
     function updateStatus() {
-        els.status.textContent = `🔍 已找到 ${found.size} / ${diffs.size} 處`;
+        els.status.innerHTML = `⬇️ 哪裡不一樣？點它！　<b>${found.size} / ${diffs.size}</b>`;
     }
 
     async function finish() {
         const n = A.store.get('spot_cleared', 0) + 1;
         A.store.set('spot_cleared', n);
-        els.status.textContent = `🎉 全部找到了！已經過關 ${n} 題`;
+        els.status.innerHTML = `🎉 全部找到了！<b>過關 ${n} 題</b>`;
         A.buzz([50, 50, 100]);
         const next = await A.modal({
             icon: '🎉', message: `眼力真好，${diffs.size} 處全部找到了！`,
